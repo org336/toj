@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     cout << "Version: " << STR(PROJECT_VERSION) << endl;
     cout << "Time:" << STR(PROJECT_BUILD_TIME) << endl;
     auto s = std::format("{:15}", "some_string");
-    cout << s << "22" << endl;
+    cout << s << "0" << endl;
 
 
     string arg = argv[1];

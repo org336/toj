@@ -1,3 +1,56 @@
 {
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "workbench.colorTheme": "Solarized Dark",
+  "python.defaultInterpreterPath": "c:\\Users\\tom\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "editor.lineNumbers": "relative",
+  "git.openRepositoryInParentFolders": "always",
+  "[python]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "git.autofetch": true,
+  "files.associations": {
+    "*.txt": "pip-requirements",
+    "*.in": "cmake"
+  },
+  "vim.vimrc.enable": true,
+  "vim.vimrc.path": "$HOME/.vimrc",
+  "inlineChat.showGutterIcon": "always",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "vscode-edge-devtools.webhintInstallNotification": true,
+  "liveServer.settings.port": 8080,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "workbench.startupEditor": "none",
+  "cmake.configureOnOpen": true,
+  "cmake.options.statusBarVisibility": "visible",
+  "[cmake]": {
+    "editor.defaultFormatter": "josetr.cmake-language-support-vscode"
+  },
+  "cmake.debugConfig": {
+    "args": ["0"]
+  },
+  "editor.formatOnSave": true,
+  "cmake.buildTask": true,
+  "triggerTaskOnSave.restart": true,
+  "triggerTaskOnSave.resultIndicator": "",
+  "triggerTaskOnSave.tasks": {
+    "rebuild-cpp": ["src/**/*.h", "src/**/*.cpp"]
+  },
+  "workbench.colorCustomizations": {},
+  "triggerTaskOnSave.resultIndicatorResetTimeout": 1
 }

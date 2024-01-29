@@ -28,7 +28,7 @@ find_package(GTest REQUIRED) # sudo apt-get install libgtest-dev
 include_directories(${GTEST_INCLUDE_DIRS})
 # gtest_add_tests(TARGET "${PROJECT_NAME}_TEST" SOURCES ${TEST_FILES})
 
-file(GLOB TEST_FILES "test/*.cpp")
+file(GLOB TEST_FILES "src/test/*.cpp")
 add_executable(${PROJECT_NAME}_test ${TEST_FILES})
 target_link_libraries(${PROJECT_NAME}_test ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
 gtest_discover_tests(${PROJECT_NAME}_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

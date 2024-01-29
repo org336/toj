@@ -7,7 +7,7 @@ TEST(sample_test_case, sample_test_1)
 
 TEST(sample_test_case, sample_test_2)
 {
-    EXPECT_EQ(3, 3);
+    EXPECT_EQ(5, 5);
 }
 
 int main(int argc, char **argv)
