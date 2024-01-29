@@ -4,6 +4,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# include_directories( "/usr/local/include/boost")
+# link_directories( "/usr/local/lib/boost")
+set(Boost_DIR "/usr/local/lib/boost/cmake/Boost-1.84.0") # Variable Capital or not is essential !!!
+# set(Boost_LIBRAIES "/usr/local/")
+find_package(Boost CONFIG REQUIRED) # FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )?
+# INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+
+
 add_subdirectory(vm)
 list(APPEND EXTRA_LIBS tvm)
 list(APPEND EXTRA_INCLUDES vm/includes)
@@ -15,7 +23,7 @@ configure_file(config.h.in config.h) # 生成 config.h 头文件
 
 file(GLOB SRC_FILES "src/*.cpp") # 获取 src 目录下的所有 .cpp 文件
 add_executable(${PROJECT_NAME} ${SRC_FILES})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${EXTRA_LIBS}) # 编译所有源文件
+target_link_libraries(${PROJECT_NAME} PUBLIC ${EXTRA_LIBS} ${Boost_LIBRAIES}) # 编译所有源文件
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR} ./vm/include) # 将二进制目录添加到 include 目录中，以便能够找到 config.h
 
 # include(CTest)
@@ -29,5 +37,5 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 file(GLOB TEST_FILES "src/test/*.cpp")
 add_executable(${PROJECT_NAME}_test ${TEST_FILES})
-target_link_libraries(${PROJECT_NAME}_test ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
+target_link_libraries(${PROJECT_NAME}_test ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${Boost_LIBRAIES} pthread)
 gtest_discover_tests(${PROJECT_NAME}_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

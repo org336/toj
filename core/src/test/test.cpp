@@ -7,8 +7,12 @@
 #include <ranges>
 #include <array>
 #include <memory>
+#include <boost/smart_ptr/shared_ptr.hpp>
 using std::cout, std::endl, std::ranges::views::iota;
 namespace views = std::ranges::views;
+class A
+{
+};
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
@@ -33,8 +37,8 @@ enum class Day : int
 
 TEST(sample_test_case, sample_test_3)
 {
-
-auto dsdsd = static_cast<std::underlying_type_t<Day>>(Day::Monday);
+    boost::shared_ptr<A> pA(new A);
+    auto dsdsd = static_cast<std::underlying_type_t<Day>>(Day::Monday);
     auto up = std::make_unique<int>(5);
     auto ds = func(std::vector<int>());
     // func(3.2);
