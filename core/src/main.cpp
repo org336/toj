@@ -2,7 +2,7 @@
 #include <config.h>
 #include <util.h>
 #include <format>
-using namespace std;
+using std::cout, std::string, std::endl;
 int main(int argc, char **argv)
 {
     cout << "Hello World!" << endl;
@@ -10,5 +10,11 @@ int main(int argc, char **argv)
     cout << "Time:" << STR(PROJECT_BUILD_TIME) << endl;
     auto s = std::format("{:15}", "some_string");
     cout << s << "22" << endl;
-    return 0;
+
+
+    string arg = argv[1];
+    if(arg == "0")
+        return 0;
+    else
+        return 1;
 }
