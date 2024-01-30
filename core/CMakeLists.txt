@@ -14,7 +14,7 @@ find_package(Boost CONFIG REQUIRED) # FIND_PACKAGE( Boost 1.40 COMPONENTS progra
 
 add_subdirectory(vm)
 list(APPEND EXTRA_LIBS tvm)
-list(APPEND EXTRA_INCLUDES vm/includes)
+list(APPEND EXTRA_INCLUDES vm/include)
 
 include_directories("./include")
 
