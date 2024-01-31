@@ -11,12 +11,21 @@ set(Boost_DIR "/usr/local/lib/boost/cmake/Boost-1.84.0") # Variable Capital or n
 find_package(Boost CONFIG REQUIRED) # FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )?
 # INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+# set(
+# set(CURL_LIBRARY /usr/lib/x86_64-linux-gnu/)
+find_package(CURL REQUIRED)
 
+
+
+set(PROGRAM_PERMISSIONS_DEFAULT
+    OWNER_WRITE OWNER_READ OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
 add_subdirectory(vm)
 list(APPEND EXTRA_LIBS tvm)
 list(APPEND EXTRA_INCLUDES vm/include)
-
-include_directories("./include")
+include_directories(./include)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install) 
 
 string(TIMESTAMP PROJECT_BUILD_TIME "%Y-%m-%d %H:%M:%S")
 configure_file(config.h.in config.h) # 生成 config.h 头文件

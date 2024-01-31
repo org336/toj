@@ -72,7 +72,8 @@
     "semaphore": "cpp",
     "stop_token": "cpp",
     "thread": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "fstream": "cpp"
   },
   "vim.vimrc.enable": true,
   "vim.vimrc.path": "$HOME/.vimrc",
@@ -104,14 +105,14 @@
     "editor.defaultFormatter": "josetr.cmake-language-support-vscode"
   },
   "cmake.debugConfig": {
-    "args": ["0"]
+    "args": ["123123"]
   },
   "editor.formatOnSave": true,
   "cmake.buildTask": true,
   "triggerTaskOnSave.restart": true,
   "triggerTaskOnSave.resultIndicator": "",
   "triggerTaskOnSave.tasks": {
-    "rebuild-cpp": ["src/**/*.h", "src/**/*.cpp"]
+    "rebuild-cpp": ["src/**/*.h", "src/**/*.cpp", "vm/**/*.h", "vm/**/*.cpp"]
   },
   "workbench.colorCustomizations": {},
   "triggerTaskOnSave.resultIndicatorResetTimeout": 1

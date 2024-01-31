@@ -1,4 +1,20 @@
-file(GLOB SRC_FILES "src/*.cpp") # 获取 src 目录下的所有 .cpp 文件
+set(TVM_PUBLIC_INCLUDE include)
+set(TVM_PRIVATE_INCLUDE src)
+file(GLOB_RECURSE TVM_SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE TVM_PUBLIC_INCLUDE_FILES "${TVM_PUBLIC_INCLUDE}/*.hpp")
+file(GLOB_RECURSE TVM_PRIVATE_INCLUDE_FILES "${TVM_PRIVATE_INCLUDE}/*.hpp")
 
-add_library(tvm ${SRC_FILES})
-target_include_directories(tvm PUBLIC ./include) 
+add_library(tvm SHARED ${TVM_SOURCE_FILES})
+
+target_include_directories(tvm PUBLIC ${TVM_PUBLIC_INCLUDE})
+target_include_directories(tvm PRIVATE ${TVM_PRIVATE_INCLUDE})
+
+target_link_libraries(tvm PUBLIC curl)
+
+set_target_properties(tvm PROPERTIES VERSION ${PROJECT_VERSION})
+
+set_target_properties(tvm
+    PROPERTIES
+    PUBLIC_HEADER "${TVM_PUBLIC_INCLUDE_FILES}"
+)
+install(TARGETS tvm DESTINATION ${CMAKE_BINARY_DIR}/lib PUBLIC_HEADER DESTINATION ${CMAKE_BINARY_DIR}/lib_header PERMISSIONS ${PROGRAM_PERMISSIONS_DEFAULT} SETUID)
