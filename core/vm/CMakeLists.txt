@@ -6,10 +6,10 @@ file(GLOB_RECURSE TVM_PRIVATE_INCLUDE_FILES "${TVM_PRIVATE_INCLUDE}/*.hpp")
 
 add_library(tvm SHARED ${TVM_SOURCE_FILES})
 
-target_include_directories(tvm PUBLIC ${TVM_PUBLIC_INCLUDE})
+target_include_directories(tvm PUBLIC ${TVM_PUBLIC_INCLUDE} ${CURL_INCLUDE_DIR})
 target_include_directories(tvm PRIVATE ${TVM_PRIVATE_INCLUDE})
 
-target_link_libraries(tvm PUBLIC curl)
+target_link_libraries(tvm PUBLIC ${CURL_LIBRARIES}/libcurl.so.4.8.0)
 
 set_target_properties(tvm PROPERTIES VERSION ${PROJECT_VERSION})
 

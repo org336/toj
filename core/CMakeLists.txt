@@ -4,19 +4,28 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# include_directories( "/usr/local/include/boost")
-# link_directories( "/usr/local/lib/boost")
-set(Boost_DIR "/usr/local/lib/boost/cmake/Boost-1.84.0") # Variable Capital or not is essential !!!
-# set(Boost_LIBRAIES "/usr/local/")
-find_package(Boost CONFIG REQUIRED) # FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )?
-# INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+set(Boost_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/boost_1_84_0/stage/lib/cmake/Boost-1.84.0")
+find_package(Boost CONFIG REQUIRED)
 # set(
 # set(CURL_LIBRARY /usr/lib/x86_64-linux-gnu/)
+set(CURL_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/libs/curl-8.6.0/lib")
+set(CURL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/curl-8.6.0/include")
 find_package(CURL REQUIRED)
 
+# include(CTest)
+enable_testing()
+# add_test(NAME Test_0 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}" "0")
+# add_test(NAME Test_1 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}" "1")
 
+include(GoogleTest)
+set(GTest_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/googletest/lib/cmake/GTest")
+find_package(GTest REQUIRED) # sudo apt-get install libgtest-dev
+# include_directories(${GTEST_INCLUDE_DIRS})
+# gtest_add_tests(TARGET "${PROJECT_NAME}_TEST" SOURCES ${TEST_FILES})
 
+include_directories(include ${EXTRA_INCLUDES} ${Boost_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install) 
 set(PROGRAM_PERMISSIONS_DEFAULT
     OWNER_WRITE OWNER_READ OWNER_EXECUTE
     GROUP_READ GROUP_EXECUTE
@@ -24,8 +33,23 @@ set(PROGRAM_PERMISSIONS_DEFAULT
 add_subdirectory(vm)
 list(APPEND EXTRA_LIBS tvm)
 list(APPEND EXTRA_INCLUDES vm/include)
-include_directories(./include)
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install) 
+message(${EXTRA_INCLUDES})
+message(${GTEST_LIBRARIES})
+message(${CURL_INCLUDE_DIRS})
+
+
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "dir='${dir}'")
+endforeach()
+
+message(${CURL_INCLUDE_DIRS})
+message(${CURL_INCLUDE_DIRS})
+message(${CURL_INCLUDE_DIRS})
+message(${CURL_INCLUDE_DIRS})
+message(${CURL_INCLUDE_DIRS})
+message(${CURL_INCLUDE_DIRS})
 
 string(TIMESTAMP PROJECT_BUILD_TIME "%Y-%m-%d %H:%M:%S")
 configure_file(config.h.in config.h) # 生成 config.h 头文件
@@ -35,14 +59,7 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${EXTRA_LIBS} ${Boost_LIBRAIES}) # 编译所有源文件
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR} ./vm/include) # 将二进制目录添加到 include 目录中，以便能够找到 config.h
 
-# include(CTest)
-enable_testing()
-# add_test(NAME Test_0 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}" "0")
-# add_test(NAME Test_1 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}" "1")
 
-find_package(GTest REQUIRED) # sudo apt-get install libgtest-dev
-include_directories(${GTEST_INCLUDE_DIRS})
-# gtest_add_tests(TARGET "${PROJECT_NAME}_TEST" SOURCES ${TEST_FILES})
 
 file(GLOB TEST_FILES "src/test/*.cpp")
 add_executable(${PROJECT_NAME}_test ${TEST_FILES})

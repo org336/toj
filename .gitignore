@@ -1,1 +1,2 @@
-build
+**/build
+core/lib-sources
