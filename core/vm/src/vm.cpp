@@ -62,8 +62,7 @@ namespace toj::core::vm
 
         // check proxy
         if (auto result = std::system("docker run hello-world > /dev/null 2>&1"); result != 0)
-            throw std::runtime_error("Current user is not able to run Docker.");
-
+            throw std::runtime_error("Current user is not able to run Docker. (maybe it is because of your internet access)");
         return true;
     }();
 
