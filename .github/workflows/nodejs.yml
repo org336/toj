@@ -24,8 +24,10 @@ jobs:
         with:
           node-version: '20.x'
       - run: |
-          cd /
+          echo $(pwd)
+          cd ../..
           ls
+          web/front/scripts/check.sh
       - run: npm install
       # - run: npm run dev
       # - run: npm ci
