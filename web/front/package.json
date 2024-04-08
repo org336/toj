@@ -1,13 +1,17 @@
 {
   "name": "toj-web-front",
-  "version": "0.0.1",
+  "version": "v1.1.7.20240408163853",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "powershell -Command \"echo Version:%npm_package_version%,Date:(Get-Date -Format yyyy-MM-dd),Message:\"\" > Version.txt\" && echo. >> Version.txt",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postbuild": "node scripts/prj-version.js build",
+    "mainver": "node scripts/prj-version.js main",
+    "mainver-minus": "node scripts/prj-version.js main minus",
+    "secver": "node scripts/prj-version.js sec",
+    "secver-minus": "node scripts/prj-version.js sec minus"
   },
   "repository": {
     "type": "git",
@@ -21,7 +25,8 @@
     "sass-loader": "^14.1.1",
     "vue": "^3.4.21",
     "vue-cookies": "^1.8.3",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "moment": "^2.30.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
