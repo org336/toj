@@ -1,28 +1,30 @@
 {
   "name": "toj-web-front",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "powershell -Command \"echo Version:%npm_package_version%,Date:(Get-Date -Format yyyy-MM-dd),Message:\"\" > Version.txt\" && echo. >> Version.txt",
     "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eMous/toj.git"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.2",
     "axios": "^1.6.8",
     "element-plus": "^2.6.3",
     "sass": "^1.72.0",
+    "sass-loader": "^14.1.1",
     "vue": "^3.4.21",
     "vue-cookies": "^1.8.3",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.3.3",
     "@vitejs/plugin-vue": "^5.0.4",
-    "@vue/eslint-config-prettier": "^8.0.0",
-    "eslint": "^8.49.0",
-    "eslint-plugin-vue": "^9.17.0",
     "vite": "^5.1.6"
   }
 }

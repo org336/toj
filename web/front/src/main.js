@@ -1,18 +1,22 @@
-import "./assets/main.css";
-
 import { createApp } from "vue";
 import App from "./App.vue";
+//引入全局组件
 import router from "./router";
 import ElementPlus from "element-plus";
+//引入全局style
+import "./assets/scss/base.scss";
 import "element-plus/dist/index.css";
-import "./assets/icon/iconfont.css";
-import "./assets/base.scss";
-//import VueCookies from "vue-cookies";
-const app = createApp(App);
+import "@fortawesome/fontawesome-free/css/all.min.css";
+//引入全局JS
+import VueCookies from "vue-cookies";
+import Verify from "./utils/Verify.js";
 
+const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
 
-//引入全局组件
-//引入全局JS
+//配置全局组件
+//配置全局JS
+app.config.globalProperties.VueCookies = VueCookies;
+app.config.globalProperties.Verify = Verify;
 app.mount("#app");
