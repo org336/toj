@@ -1,6 +1,6 @@
 {
   "name": "toj-web-front",
-  "version": "v1.1.7.20240408163853",
+  "version": "v1.1.8.20240408165408",
   "private": true,
   "type": "module",
   "scripts": {

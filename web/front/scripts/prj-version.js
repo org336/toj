@@ -49,3 +49,5 @@ pkg.version = `v${version[0]}.${version[1]}.${version[2]}.${version[3]}`;
 console.log(`new version: ${pkg.version}`);
 import fs from 'fs';
 fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2));
+let versionPath = path.dirname(new URL(import.meta.url).pathname) + "/../VERSION";
+fs.writeFileSync(versionPath, pkg.version);
