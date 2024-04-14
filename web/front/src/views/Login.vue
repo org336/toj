@@ -121,9 +121,16 @@
       </div>
     </div>
   </div>
+  <Verify
+    mode="pop"
+    :captchaType="captchaType"
+    :imgSize="{ width: '400px', height: '200px' }"
+    ref="verify"
+  ></Verify>
 </template>
 
 <script setup>
+import Verify from "../components/verifition/Verify.vue";
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
 const { proxy } = getCurrentInstance();
 const loginLoading = ref(false);
@@ -141,6 +148,13 @@ const signUpForm = ref({
   confirmPassword: "",
 });
 
+// 处理滑动验证码逻辑
+const verify = ref(null);
+const captchaType = ref("");
+const onShow = (type) => {
+  captchaType.value = type;
+  verify.value.show();
+};
 const loginRules = {
   email: [
     { required: true, message: "请输入邮箱" },
@@ -184,6 +198,7 @@ const signUpRules = {
 };
 
 const Login = (formData) => {
+  onShow("blockPuzzle");
   loginRef.value.validate((valid) => {
     if (valid) {
       loginLoading.value = true;
