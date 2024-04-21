@@ -132,6 +132,9 @@
 <script setup>
 import Verify from "../components/verifition/Verify.vue";
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
 const { proxy } = getCurrentInstance();
 const loginLoading = ref(false);
 const signUploading = ref(false);
@@ -209,6 +212,7 @@ const Login = (formData) => {
       }, 500);
     }
   });
+  router.push({ name: "Home" });
 };
 
 const SignUp = (formData) => {
@@ -238,30 +242,5 @@ const showSignIn = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/login";
-.el-button.is-round {
-  border-radius: 49px;
-}
-
-.el-form-item {
-  margin-bottom: 0;
-}
-
-.el-form-item.is-error .el-input__inner,
-.el-form-item.is-error .el-input__inner:focus,
-.el-form-item.is-error .el-select-v2__wrapper,
-.el-form-item.is-error .el-select-v2__wrapper:focus,
-.el-form-item.is-error .el-textarea__inner,
-.el-form-item.is-error .el-textarea__inner:focus {
-  box-shadow: none;
-}
-
-.el-input {
-  align-items: center;
-  margin-right: 8px;
-}
-
-.el-input .el-input__icon {
-  font-size: 1.4em;
-}
+@import "../assets/scss/login.scss";
 </style>

@@ -1,10 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body,
 input {
   font-family: "Poppins", sans-serif;
@@ -75,19 +69,24 @@ form.sign-in-form {
   border-radius: 55px;
   grid-template-columns: 15% 80%;
   padding: 0 0.3rem;
-
+  .el-form-item {
+    margin-bottom: 0;
+  }
   i {
     text-align: center;
     line-height: 55px;
     color: #acacac;
     transition: 0.5s;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
   .el-input {
-    line-height: 1.2rem;
+    line-height: 1.3rem;
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: #333;
+    &hover {
+      border-left: 5px solid #acacac;
+    }
     :deep(.el-input__wrapper) {
       background-color: #f0f0f0;
       outline: none;
@@ -100,7 +99,6 @@ form.sign-in-form {
     }
   }
 }
-
 .input-field .input-field .el-input .input-field .el-input::placeholder {
   color: #aaa;
   font-weight: 500;

@@ -3,6 +3,7 @@ import App from "./App.vue";
 //引入全局组件
 import router from "./router";
 import ElementPlus from "element-plus";
+import store from "./store/index.js";
 //引入全局style
 import "./assets/scss/base.scss";
 import "element-plus/dist/index.css";
@@ -14,6 +15,7 @@ import Verify from "./utils/Verify.js";
 const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
+app.use(store);
 
 //配置全局组件
 //配置全局JS
