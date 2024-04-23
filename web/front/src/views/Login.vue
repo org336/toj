@@ -2,12 +2,7 @@
   <div class="container">
     <div class="forms-container">
       <div class="signin-signup">
-        <el-form
-          ref="loginRef"
-          :model="loginForm"
-          :rules="loginRules"
-          class="sign-in-form"
-        >
+        <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="sign-in-form">
           <h2 class="title">登录</h2>
           <div class="input-field">
             <i class="fa-solid fa-user"></i>
@@ -44,17 +39,12 @@
             {{ loginLoading ? "登 录 中" : "登 录" }}
           </el-button>
         </el-form>
-        <el-form
-          ref="signUpRef"
-          :model="signUpForm"
-          :rules="signUpRules"
-          class="sign-up-form"
-        >
+        <el-form ref="signUpRef" :model="signUpForm" :rules="signUpRules" class="sign-up-form">
           <h2 class="title">注册</h2>
           <div class="input-field">
             <i class="fa-solid fa-user"></i>
             <el-form-item prop="email">
-              <el-input v-model.trim="signUpForm.name" clearable placeholder="邮箱" />
+              <el-input v-model.trim="signUpForm.email" clearable placeholder="邮箱" />
             </el-form-item>
           </div>
           <div class="input-field">
@@ -130,6 +120,7 @@
 </template>
 
 <script setup>
+import { ElMessage } from "element-plus";
 import Verify from "../components/verifition/Verify.vue";
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -197,7 +188,6 @@ const signUpRules = {
     { required: true, message: "请再次输入密码" },
     { validator: confirmPassword, message: "两次输入的密码不一致!" },
   ],
-  checkCode: [{ required: true, message: "请输入验证码" }],
 };
 
 const Login = (formData) => {
@@ -209,7 +199,7 @@ const Login = (formData) => {
       setTimeout(() => {
         ElMessage.success("登录成功");
         loginLoading.value = false;
-      }, 500);
+      }, 5000);
     }
   });
   router.push({ name: "Home" });

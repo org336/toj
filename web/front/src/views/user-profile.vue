@@ -29,6 +29,10 @@ const { proxy } = getCurrentInstance();
 
 <style lang="scss" scoped>
 .profile {
+  width: 80%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 24px;
   :deep(.el-menu) {
     .el-menu-item {
       i {

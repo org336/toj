@@ -12,7 +12,7 @@
       <div class="nav-middle"></div>
       <div class="nav-end">
         <!-- 搜索框 -->
-        <el-input placeholder="搜索">
+        <el-input placeholder="搜索一下">
           <template #prefix><i class="fas fa-search"></i></template>
         </el-input>
         <!-- 消息图标 -->
@@ -130,8 +130,9 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch } from "vue";
+import { ref, getCurrentInstance, watch, watchEffect } from "vue";
 import { useStore } from "vuex";
+const store = useStore();
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
@@ -157,8 +158,12 @@ watch(router.currentRoute, () => {
 });
 
 //处理右边栏的数据
-const userName = ref("XXX");
-const userSignature = ref("XXXXXXXXXXXX");
+const userName = ref("");
+const userSignature = ref("");
+watchEffect(() => {
+  userName.value = store.state.user.username;
+  userSignature.value = store.state.user.signature;
+});
 </script>
 
 <style lang="scss" scoped>

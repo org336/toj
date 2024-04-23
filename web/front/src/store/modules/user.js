@@ -6,7 +6,7 @@ export default {
     phone: "18370223323", // 手机号
     signature: "开发灵感", // 签名
     studentId: "1520223609", // 学号
-    password: "xxxxxxx", // 密码
+    password: "test123456~", // 密码
   },
   mutations: {
     updateProfile(state, newProfile) {
@@ -15,13 +15,8 @@ export default {
     updatePassword(state, newPassword) {
       state.password = newPassword;
     },
-    saveStateToLocalStorage(state) {
-      localStorage.setItem("user", JSON.stringify(state));
-    },
   },
-  actions: {
-    // 在这里定义你的 actions
-  },
+  actions: {},
   getters: {
     // 在这里定义你的 getters
   },

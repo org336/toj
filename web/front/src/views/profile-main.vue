@@ -3,23 +3,23 @@
     <el-row class="row-top">
       <el-col :span="12">个人简介</el-col>
     </el-row>
-    <el-row :gutter="20" class="row-bottom">
-      <el-col :span="12" class="row-bottom-left">
-        <el-form label-width="80px">
-          <el-form-item label="昵称">
-            <el-input v-model.trim="username" clearable></el-input>
+    <el-row :gutter="20" class="row-middle">
+      <el-col :span="12" class="row-middle-left">
+        <el-form label-width="80px" :model="profile" :rules="profileRules">
+          <el-form-item label="昵称" prop="username">
+            <el-input v-model.trim="profile.username" clearable></el-input>
           </el-form-item>
-          <el-form-item label="个人签名">
-            <el-input v-model.trim="signature" clearable></el-input>
+          <el-form-item label="签名" prop="signature">
+            <el-input v-model.trim="profile.signature" clearable></el-input>
           </el-form-item>
-          <el-form-item label="邮箱">
-            <el-input v-model.trim="email" clearable></el-input>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model.trim="profile.email" clearable></el-input>
           </el-form-item>
-          <el-form-item label="手机号">
-            <el-input v-model.trim="phone" clearable></el-input>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model.trim="profile.phone" clearable></el-input>
           </el-form-item>
-          <el-form-item label="学号">
-            <el-input v-model.trim="studentId" clearable></el-input>
+          <el-form-item label="学号" prop="studentId">
+            <el-input v-model.trim="profile.studentId" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="updateProfile">更新信息</el-button>
@@ -46,28 +46,39 @@ const avatarUrl = ref(""); // 头像 URL
 const onAvatarChange = (file) => {
   // 在这里处理头像文件的上传
 };
-const username = ref("");
-const signature = ref("");
-const email = ref("");
-const phone = ref("");
-const studentId = ref("");
-
+const profile = ref({
+  username: "",
+  signature: "",
+  email: "",
+  phone: "",
+  studentId: "",
+});
+const profileRules = {
+  username: [{ required: true, message: "请输入昵称" }],
+  signature: [{ required: true, message: "请输入个人签名" }],
+  email: [
+    { required: true, message: "请输入邮箱" },
+    { validator: proxy.Verify.email, message: "邮箱不存在" },
+  ],
+  phone: [
+    { required: true, message: "请输入手机号" },
+    { validator: proxy.Verify.phone, message: "手机号不存在" },
+  ],
+  studentId: [
+    { required: true, message: "请输入学号" },
+    { validator: proxy.Verify.studentId, message: "学号不存在" },
+  ],
+};
 watchEffect(() => {
-  username.value = store.state.user.username;
-  signature.value = store.state.user.signature;
-  email.value = store.state.user.email;
-  phone.value = store.state.user.phone;
-  studentId.value = store.state.user.studentId;
+  profile.value.username = store.state.user.username;
+  profile.value.signature = store.state.user.signature;
+  profile.value.email = store.state.user.email;
+  profile.value.phone = store.state.user.phone;
+  profile.value.studentId = store.state.user.studentId;
 });
 
 const updateProfile = () => {
-  store.commit("user/updateProfile", {
-    username: username.value,
-    signature: signature.value,
-    email: email.value,
-    phone: phone.value,
-    studentId: studentId.value,
-  });
+  store.commit("user/updateProfile", profile.value);
 };
 </script>
 
@@ -81,12 +92,20 @@ const updateProfile = () => {
     margin-bottom: 18px;
     border-bottom: 1px solid #cdc7c7;
   }
-  .row-bottom {
+  .row-middle {
     width: 100%;
-    .row-bottom-left {
+    .row-middle-left {
       margin-right: 62px;
-      .input {
-        width: 100%;
+      .el-form-item {
+        :deep(.el-form-item__label) {
+          font-size: 1.1rem;
+        }
+        :deep(.el-form-item__content) {
+          .el-input {
+            width: 280px;
+            font-size: 1.1rem;
+          }
+        }
       }
     }
     .row-bottom-right {

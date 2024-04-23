@@ -29,7 +29,9 @@
     "vue": "^3.4.21",
     "vue-cookies": "^1.8.3",
     "vue-router": "^4.3.0",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "vxe-table": "^4.6.0",
+    "xe-utils": "^3.5.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
