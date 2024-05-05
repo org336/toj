@@ -12,8 +12,8 @@
       </div>
       <div class="class-list">
         <el-menu class="el-menu" :default-active="selectedClass" @select="handleSelect">
-          <el-menu-item v-for="item in classeItems" :index="item.name"
-            >{{ item.name }}
+          <el-menu-item v-for="item in classeItems" :index="item.name">
+            {{ item.name }}
           </el-menu-item>
         </el-menu>
       </div>
@@ -37,7 +37,7 @@
         keep-source
         ref="xTable"
         :loading="loading"
-        :data="tableData"
+        :data="filteredTableData"
         :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
       >
         <vxe-column type="checkbox" width="60"></vxe-column>
@@ -185,7 +185,8 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from "vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
+const { proxy } = getCurrentInstance();
 import XEUtils from "xe-utils";
 //左侧处理班级逻辑
 const classeItems = ref([
@@ -230,6 +231,9 @@ const searchClass = ref("");
 // 当前选中的班级
 const handleSelect = (index) => {
   selectedClass.value = index;
+  filteredTableData.value = tableData.value.filter(
+    (item) => item.class === selectedClass.value
+  );
 };
 const selectedClass = ref(classeItems.value[0].name);
 // 添加班级
@@ -277,12 +281,36 @@ const tableData = ref([
     class: "计科1701",
     joinTime: "2020-12-04",
   },
+  {
+    name: "李四",
+    studentId: "123456",
+    department: "计算机科学与技术学院",
+    major: "计算机科学与技术",
+    class: "计科1702",
+    joinTime: "2017-09-01",
+  },
+  {
+    name: "李四",
+    studentId: "123456",
+    department: "计算机科学与技术学院",
+    major: "计算机科学与技术",
+    class: "计科1702",
+    joinTime: "2017-09-01",
+  },
+  {
+    name: "李四",
+    studentId: "123456",
+    department: "计算机科学与技术学院",
+    major: "计算机科学与技术",
+    class: "计科1702",
+    joinTime: "2020-12-04",
+  },
 ]);
-
+//筛选对应班级的人员
+const filteredTableData = ref([]);
 const xTable = ref();
 //显示表格是否加载中
 const loading = ref(false);
-
 const formatDate = ({ cellValue }) => {
   return XEUtils.toDateString(cellValue, "yyyy-MM-dd");
 };
@@ -322,10 +350,10 @@ const saveUpdateEvent = (row) => {
         row.loading = false;
         // 保存完成后将行恢复到初始状态
         $table.reloadRow(row, {});
-        VXETable.modal.message({ content: "保存成功！", status: "success" });
+        xTable.modal.message({ content: "保存成功！", status: "success" });
       }, 300);
     } else {
-      VXETable.modal.message({ content: "数据未改动！", status: "info" });
+      xTable.modal.message({ content: "数据未改动！", status: "info" });
     }
   }
 };
@@ -363,6 +391,9 @@ const saveEvent = () => {
     ];
   }, 300);
 };
+onMounted(() => {
+  handleSelect(selectedClass.value);
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="profile-pwd">
     <el-row class="row-top">
       <el-col :span="12">修改密码</el-col>
     </el-row>
@@ -8,7 +8,13 @@
         <el-row :span="6"> <div class="row-title">旧密码</div></el-row>
         <el-row :span="12">
           <el-form-item prop="password">
-            <el-input type="password" v-model="pwdForm.oldPassword" clearable show-password>
+            <el-input
+              type="password"
+              v-model.trim="pwdForm.oldPassword"
+              clearable
+              autocomplete="off"
+              show-password
+            >
             </el-input>
           </el-form-item>
         </el-row>
@@ -17,7 +23,13 @@
         <el-row :span="6"> <div class="row-title">新密码</div></el-row>
         <el-row :span="12">
           <el-form-item prop="password">
-            <el-input type="password" v-model="pwdForm.newPassword" clearable show-password>
+            <el-input
+              type="password"
+              v-model.trim="pwdForm.newPassword"
+              clearable
+              autocomplete="off"
+              show-password
+            >
             </el-input>
           </el-form-item>
         </el-row>
@@ -26,7 +38,13 @@
         <el-row :span="6"> <div class="row-title">确认新密码</div></el-row>
         <el-row :span="12">
           <el-form-item prop="confirmPassword">
-            <el-input type="password" v-model="pwdForm.confirmPassword" clearable show-password>
+            <el-input
+              type="password"
+              v-model.trim="pwdForm.confirmPassword"
+              clearable
+              autocomplete="off"
+              show-password
+            >
             </el-input>
           </el-form-item>
         </el-row></div
@@ -46,32 +64,29 @@ const pwdForm = ref({
   newPassword: "",
   confirmPassword: "",
 });
-const confirmPassword = (rule, value, callback) => {
-  if (value === "") {
-    callback(new Error("请再次输入密码"));
-  } else if (value != pwdForm.value.newPassword) {
-    callback(new Error("两次输入密码不一致!"));
-  } else {
-    callback();
-  }
-};
 const pwdRules = {
   password: [
     { required: true, message: "请输入密码" },
     {
       validator: proxy.Verify.password,
       message: "密码只能是数字、字母、特殊字符的8-18位组合",
+      trigger: "blur",
     },
   ],
   confirmPassword: [
     { required: true, message: "请再次输入密码" },
-    { validator: confirmPassword, message: "两次输入的密码不一致!" },
+    {
+      validator: (rule, value, callback) =>
+        proxy.Verify.confirmPassword(rule, value, callback, pwdForm.value.newPassword),
+      trigger: "blur",
+    },
   ],
 };
 </script>
 
 <style lang="scss" scoped>
-.profile {
+.profile-pwd {
+  margin: 16px;
   .row-top {
     height: 36px;
     text-align: left;

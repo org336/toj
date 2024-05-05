@@ -6,7 +6,7 @@
         <button class="hamburger" @click="toggleLeftSidebar">
           <i class="fas fa-bars"></i>
         </button>
-        <div class="top-icon"><img src="../assets/whale.png" alt="" /></div>
+        <div class="top-icon"><img src="../assets/whale.png" /></div>
         <div class="top-name">蓝鲸</div>
       </div>
       <div class="nav-middle"></div>
@@ -22,7 +22,7 @@
 
         <!-- 用户头像 -->
         <div class="avatar">
-          <el-avatar src="" shape="square">{{ userName }}</el-avatar>
+          <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
         </div>
         <div class="right-arrow" @click="toggleRightSidebar">
           <i class="fas fa-chevron-left"></i>
@@ -69,9 +69,9 @@
         <div class="sidebar-top">
           <div class="user">
             <div class="user-avatar">
-              <el-avatar src="" shape="square">{{ userName }}</el-avatar>
+              <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
             </div>
-            <div class="user-name">{{ userName }}</div>
+            <div class="user-name">{{ profile.username }}</div>
           </div>
           <div class="leave" @click="toggleRightSidebar">
             <i class="fas fa-times"></i>
@@ -80,7 +80,7 @@
 
         <div class="sidebar-bottom">
           <el-menu class="el-menu" :router="true">
-            <el-menu-item index="signaturePage">{{ userSignature }}</el-menu-item>
+            <el-menu-item index="signaturePage">{{ profile.signature }}</el-menu-item>
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
             <el-menu-item index="/profile">
               <i class="fa-regular fa-user"></i> 个人信息
@@ -131,8 +131,8 @@
 
 <script setup>
 import { ref, getCurrentInstance, watch, watchEffect } from "vue";
-import { useStore } from "vuex";
-const store = useStore();
+import { useUserStore } from "@/store/user";
+import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
@@ -158,12 +158,8 @@ watch(router.currentRoute, () => {
 });
 
 //处理右边栏的数据
-const userName = ref("");
-const userSignature = ref("");
-watchEffect(() => {
-  userName.value = store.state.user.username;
-  userSignature.value = store.state.user.signature;
-});
+const store = useUserStore();
+const { profile } = storeToRefs(store);
 </script>
 
 <style lang="scss" scoped>

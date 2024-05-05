@@ -20,11 +20,10 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch } from "vue";
+import { ref, getCurrentInstance } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
-const { proxy } = getCurrentInstance();
 </script>
 
 <style lang="scss" scoped>
@@ -32,7 +31,7 @@ const { proxy } = getCurrentInstance();
   width: 80%;
   height: 100%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 16px;
   :deep(.el-menu) {
     .el-menu-item {
       i {

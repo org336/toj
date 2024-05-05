@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="profile-main">
     <el-row class="row-top">
       <el-col :span="12">个人简介</el-col>
     </el-row>
@@ -28,7 +28,7 @@
       >
       <el-col :span="8" class="row-bottom-right">
         <div class="title">个人头像</div>
-        <el-avatar :src="avatar" size="large"> </el-avatar>
+        <el-avatar :src="profile.avatar" size="large"> </el-avatar>
         <el-upload action="" :on-change="onAvatarChange">
           <el-button size="default" type="primary">更换头像</el-button>
         </el-upload>
@@ -39,51 +39,37 @@
 
 <script setup>
 import { ref, getCurrentInstance, watchEffect } from "vue";
-import { useStore } from "vuex";
-const store = useStore();
+import { useUserStore } from "@/store/user";
+import { storeToRefs } from "pinia";
 const { proxy } = getCurrentInstance();
 const avatarUrl = ref(""); // 头像 URL
 const onAvatarChange = (file) => {
   // 在这里处理头像文件的上传
 };
-const profile = ref({
-  username: "",
-  signature: "",
-  email: "",
-  phone: "",
-  studentId: "",
-});
+const store = useUserStore();
+const { profile } = storeToRefs(store);
+const { updateProfile } = store;
 const profileRules = {
   username: [{ required: true, message: "请输入昵称" }],
   signature: [{ required: true, message: "请输入个人签名" }],
   email: [
     { required: true, message: "请输入邮箱" },
-    { validator: proxy.Verify.email, message: "邮箱不存在" },
+    { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
   ],
   phone: [
     { required: true, message: "请输入手机号" },
-    { validator: proxy.Verify.phone, message: "手机号不存在" },
+    { validator: proxy.Verify.phone, message: "手机号不存在", trigger: "blur" },
   ],
   studentId: [
     { required: true, message: "请输入学号" },
-    { validator: proxy.Verify.studentId, message: "学号不存在" },
+    { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
   ],
-};
-watchEffect(() => {
-  profile.value.username = store.state.user.username;
-  profile.value.signature = store.state.user.signature;
-  profile.value.email = store.state.user.email;
-  profile.value.phone = store.state.user.phone;
-  profile.value.studentId = store.state.user.studentId;
-});
-
-const updateProfile = () => {
-  store.commit("user/updateProfile", profile.value);
 };
 </script>
 
 <style lang="scss" scoped>
-.profile {
+.profile-main {
+  margin: 16px;
   .row-top {
     height: 36px;
     text-align: left;

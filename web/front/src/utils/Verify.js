@@ -15,6 +15,15 @@ const verify = (rule, value, reg, callback) => {
     callback();
   }
 };
+const confirmPassword = (rule, value, callback, password) => {
+  if (value === "") {
+    callback(new Error("请再次输入密码"));
+  } else if (value !== password) {
+    callback(new Error("两次输入密码不一致!"));
+  } else {
+    callback();
+  }
+};
 export default {
   email: (rule, value, callback) => {
     return verify(rule, value, regs.email, callback);
@@ -27,5 +36,8 @@ export default {
   },
   password: (rule, value, callback) => {
     return verify(rule, value, regs.password, callback);
+  },
+  confirmPassword: (rule, value, callback, passwordRef) => {
+    return confirmPassword(rule, value, callback, passwordRef);
   },
 };

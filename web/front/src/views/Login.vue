@@ -1,18 +1,85 @@
 <template>
-  <div class="container">
+  <div class="container" ref="containerRef">
     <div class="forms-container">
       <div class="signin-signup">
-        <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="sign-in-form">
+        <el-form
+          ref="resetRef"
+          :model="resetForm"
+          :rules="resetRules"
+          class="reset-form"
+          v-if="showResetForm"
+        >
+          <h2 class="title">重置密码</h2>
+          <div class="input-field">
+            <i class="fa-solid fa-user"></i>
+            <el-form-item prop="email">
+              <el-input v-model.trim="resetForm.email" placeholder="邮箱" clearable />
+            </el-form-item>
+          </div>
+          <div class="emailCode-row">
+            <div class="input-field emailCode">
+              <i class="fas fa-envelope"></i>
+              <el-form-item prop="emailCode">
+                <el-input v-model.trim="resetForm.emailCode" placeholder="验证码" />
+              </el-form-item>
+            </div>
+            <el-button type="primary" class="btn" round @click="sendEmailCode">
+              发送验证码
+            </el-button>
+          </div>
+          <div class="input-field">
+            <i class="fa-solid fa-lock"></i>
+            <el-form-item prop="password">
+              <el-input
+                v-model.trim="resetForm.password"
+                type="password"
+                placeholder="新密码"
+                autocomplete="off"
+                show-password
+                clearable
+              />
+            </el-form-item>
+          </div>
+          <div class="input-field">
+            <i class="fa-solid fa-lock"></i>
+            <el-form-item prop="confirmPassword">
+              <el-input
+                v-model.trim="resetForm.confirmPassword"
+                type="password"
+                placeholder="确认新密码"
+                autocomplete="off"
+                show-password
+                clearable
+              />
+            </el-form-item>
+          </div>
+          <div class="reset-line">
+            <el-button
+              type="primary"
+              :loading="resetLoading"
+              @click="reset(resetForm)"
+              class="btn form"
+              round
+            >
+              {{ resetLoading ? "重 置 中" : "点击重置" }}
+            </el-button>
+            <button type="reset" class="btn transparent link" @click="showResetLogin">
+              去登陆!
+            </button>
+          </div>
+        </el-form>
+        <el-form
+          ref="loginRef"
+          :model="loginForm"
+          :rules="loginRules"
+          class="sign-in-form"
+          v-if="!showResetForm"
+        >
           <h2 class="title">登录</h2>
           <div class="input-field">
             <i class="fa-solid fa-user"></i>
             <el-form-item prop="email">
-              <el-input
-                v-model.trim="loginForm.email"
-                placeholder="邮箱"
-                clearable
-                @keyup.enter="Login(loginForm)"
-              />
+              <el-input v-model.trim="loginForm.email" placeholder="邮箱" clearable />
             </el-form-item>
           </div>
           <div class="input-field">
@@ -25,20 +92,25 @@
                 autocomplete="off"
                 show-password
                 clearable
-                @keyup.enter="Login(loginForm)"
               />
             </el-form-item>
           </div>
-          <el-button
-            type="primary"
-            :loading="loginLoading"
-            @click="Login(loginForm)"
-            class="btn form"
-            round
-          >
-            {{ loginLoading ? "登 录 中" : "登 录" }}
-          </el-button>
+          <div class="reset-line">
+            <el-button
+              type="primary"
+              :loading="loginLoading"
+              @click="Login(loginForm)"
+              class="btn form"
+              round
+            >
+              {{ loginLoading ? "登 录 中" : "点击登录" }}
+            </el-button>
+            <button type="reset" class="btn transparent link" @click="showReset">
+              忘记密码？
+            </button>
+          </div>
         </el-form>
+
         <el-form ref="signUpRef" :model="signUpForm" :rules="signUpRules" class="sign-up-form">
           <h2 class="title">注册</h2>
           <div class="input-field">
@@ -70,7 +142,7 @@
             <i class="fa-solid fa-lock"></i>
             <el-form-item prop="confirmPassword">
               <el-input
-                v-model="signUpForm.confirmPassword"
+                v-model.trim="signUpForm.confirmPassword"
                 type="password"
                 clearable
                 placeholder="确认密码"
@@ -86,7 +158,7 @@
             class="btn form"
             round
           >
-            {{ signUploading ? "注 册 中" : "注 册" }}
+            {{ signUploading ? "注 册 中" : "点击注册" }}
           </el-button>
         </el-form>
       </div>
@@ -96,8 +168,8 @@
       <div class="panel left-panel">
         <div class="content">
           <h3>新用户 ?</h3>
-          <p>请输入您的信息</p>
-          <button class="btn transparent" @click="showSignUp">注 册</button>
+          <p>请输入您的INFO</p>
+          <button class="btn transparent" @click="showSignUp">去注册</button>
         </div>
         <img src="../assets/register.svg" class="image" alt="" />
       </div>
@@ -105,7 +177,7 @@
         <div class="content">
           <h3>已有账号 ?</h3>
           <p>请登录以享受CODE</p>
-          <button class="btn transparent" @click="showSignIn">登 录</button>
+          <button class="btn transparent" @click="showSignIn">去登录</button>
         </div>
         <img src="../assets/log.svg" class="image" alt="" />
       </div>
@@ -122,15 +194,17 @@
 <script setup>
 import { ElMessage } from "element-plus";
 import Verify from "../components/verifition/Verify.vue";
-import { ref, reactive, getCurrentInstance, nextTick } from "vue";
+import { ref, getCurrentInstance, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
 const loginLoading = ref(false);
 const signUploading = ref(false);
+const resetLoading = ref(false);
 const loginRef = ref(null);
 const signUpRef = ref(null);
+const resetRef = ref(null);
 const loginForm = ref({
   name: "",
   password: "",
@@ -141,7 +215,12 @@ const signUpForm = ref({
   password: "",
   confirmPassword: "",
 });
-
+const resetForm = ref({
+  email: "",
+  emailCode: "",
+  password: "",
+  confirmPassword: "",
+});
 // 处理滑动验证码逻辑
 const verify = ref(null);
 const captchaType = ref("");
@@ -152,45 +231,64 @@ const onShow = (type) => {
 const loginRules = {
   email: [
     { required: true, message: "请输入邮箱" },
-    { validator: proxy.Verify.email, message: "邮箱不存在" },
+    { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码" },
-    { validator: proxy.Verify.password, message: "密码格式不正确" },
+    { validator: proxy.Verify.password, message: "密码格式不正确", trigger: "blur" },
   ],
-};
-const confirmPassword = (rule, value, callback) => {
-  if (value === "") {
-    callback(new Error("请再次输入密码"));
-  } else if (value != signUpForm.value.password) {
-    callback(new Error("两次输入密码不一致!"));
-  } else {
-    callback();
-  }
 };
 const signUpRules = {
   email: [
     { required: true, message: "请输入邮箱" },
-    { validator: proxy.Verify.email, message: "邮箱不存在" },
+    { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
+  ],
+  phone: [
+    { required: true, message: "请输入手机号" },
+    { validator: proxy.Verify.phone, message: "手机号不存在", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码" },
     {
       validator: proxy.Verify.password,
       message: "密码只能是数字、字母、特殊字符的8-18位组合",
+      trigger: "blur",
     },
-  ],
-  phone: [
-    { required: true, message: "请输入手机号" },
-    { validator: proxy.Verify.phone, message: "手机号不存在" },
   ],
   confirmPassword: [
     { required: true, message: "请再次输入密码" },
-    { validator: confirmPassword, message: "两次输入的密码不一致!" },
+    {
+      validator: (rule, value, callback) =>
+        proxy.Verify.confirmPassword(rule, value, callback, signUpForm.value.password),
+      trigger: "blur",
+    },
   ],
 };
-
+const resetRules = {
+  email: [
+    { required: true, message: "请输入邮箱" },
+    { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
+  ],
+  emailCode: [{ required: true, message: "请输入验证码" }],
+  password: [
+    { required: true, message: "请输入新密码" },
+    {
+      validator: proxy.Verify.password,
+      message: "密码只能是数字、字母、特殊字符的8-18位组合",
+      trigger: "blur",
+    },
+  ],
+  confirmPassword: [
+    { required: true, message: "请再次输入密码" },
+    {
+      validator: (rule, value, callback) =>
+        proxy.Verify.confirmPassword(rule, value, callback, resetForm.value.password),
+      trigger: "blur",
+    },
+  ],
+};
 const Login = (formData) => {
+  //滑动框验证
   onShow("blockPuzzle");
   loginRef.value.validate((valid) => {
     if (valid) {
@@ -219,15 +317,43 @@ const SignUp = (formData) => {
   });
   signUploading.value = false;
 };
-
-const showSignUp = () => {
-  const container = document.querySelector(".container");
-  container.classList.add("sign-up-mode");
+const sendEmailCode = () => {};
+const reset = (formData) => {
+  resetRef.value.validate((valid) => {});
 };
-
+const containerRef = ref();
+const showResetForm = ref(false);
+const showReset = () => {
+  showResetForm.value = true;
+  if (loginRef.value) {
+    loginRef.value.resetFields();
+  }
+};
+const showResetLogin = () => {
+  showResetForm.value = false;
+  if (resetRef.value) {
+    resetRef.value.resetFields();
+  }
+};
+const showSignUp = () => {
+  showResetForm.value = false;
+  if (loginRef.value) {
+    loginRef.value.resetFields();
+  }
+  if (resetRef.value) {
+    resetRef.value.resetFields();
+  }
+  containerRef.value.classList.add("sign-up-mode");
+};
 const showSignIn = () => {
-  const container = document.querySelector(".container");
-  container.classList.remove("sign-up-mode");
+  showResetForm.value = false;
+  if (signUpRef.value) {
+    signUpRef.value.resetFields();
+  }
+  if (resetRef.value) {
+    resetRef.value.resetFields();
+  }
+  containerRef.value.classList.remove("sign-up-mode");
 };
 </script>
 

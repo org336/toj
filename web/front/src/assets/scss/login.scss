@@ -1,9 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
-body,
-input {
-  font-family: "Poppins", sans-serif;
-}
-
 .container {
   position: relative;
   width: 100%;
@@ -52,9 +47,12 @@ form.sign-up-form {
 form.sign-in-form {
   z-index: 2;
 }
-
+form.reset-form {
+  z-index: 3;
+}
 .title {
-  font-size: 2.2rem;
+  font-size: 2rem;
+  font-weight: bold;
   color: #444;
   margin-bottom: 10px;
 }
@@ -72,13 +70,7 @@ form.sign-in-form {
   .el-form-item {
     margin-bottom: 0;
   }
-  i {
-    text-align: center;
-    line-height: 55px;
-    color: #acacac;
-    transition: 0.5s;
-    font-size: 1.3rem;
-  }
+
   .el-input {
     line-height: 1.3rem;
     font-weight: 600;
@@ -98,6 +90,20 @@ form.sign-in-form {
       }
     }
   }
+}
+i {
+  text-align: center;
+  line-height: 55px;
+  color: #acacac;
+  transition: 0.5s;
+  font-size: 1.3rem;
+}
+.emailCode-row {
+  display: flex;
+}
+.input-field.emailCode {
+  max-width: 230px;
+  grid-template-columns: 25% 70%;
 }
 .input-field .input-field .el-input .input-field .el-input::placeholder {
   color: #aaa;
@@ -225,22 +231,32 @@ form.sign-in-form {
   font-size: 0.95rem;
   padding: 0.7rem 0;
 }
-
+.reset-line {
+  .el-button {
+    margin-left: 120px;
+  }
+  .link {
+    margin-left: 120px;
+  }
+}
 .btn.transparent {
   margin: 0;
   background: none;
   border: 2px solid #fff;
   width: 130px;
-  height: 41px;
+  height: 42px;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .btn.transparent:hover {
   background: #fff;
   color: #5995fd;
 }
-
+.btn.link {
+  background-color: #fff;
+  color: #5995fd;
+}
 .right-panel .image,
 .right-panel .content {
   transform: translateX(800px);
@@ -347,7 +363,7 @@ form.sign-in-form {
 
   .btn.transparent {
     width: 110px;
-    height: 35px;
+    height: 38px;
     font-size: 0.7rem;
   }
 

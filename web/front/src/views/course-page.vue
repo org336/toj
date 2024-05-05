@@ -26,10 +26,13 @@
     </div>
     <div class="course-content">
       <template v-if="activeTab === 'tab1'"
-        ><el-card class="course-item" v-for="(course, index) in studyCourses" :key="index">
-          <el-image :src="course.image" fit="contain" class="course-image"
-            ><template #error> <div class="image-slot"></div> </template
-          ></el-image>
+        ><el-card
+          shadow="hover"
+          class="course-item"
+          v-for="(course, index) in studyCourses"
+          :key="index"
+        >
+          <el-image :src="course.image" fit="cover" class="course-image" />
           <template #footer>
             <div class="course-info">
               <div class="course-name">{{ course.name }}</div>
@@ -49,11 +52,14 @@
           </template>
         </el-card></template
       >
-      <template v-if="activeTab === 'tab2'"
-        ><el-card class="course-item" v-for="(course, index) in teachCourses" :key="index">
-          <el-image :src="course.image" :fit="contain" class="course-image"
-            ><template #error> <div class="image-slot"></div> </template
-          ></el-image>
+      <template v-if="activeTab === 'tab2'">
+        <el-card
+          shadow="hover"
+          class="course-item"
+          v-for="(course, index) in teachCourses"
+          :key="index"
+        >
+          <el-image :src="course.image" :fit="contain" class="course-image"> ></el-image>
           <template #footer>
             <div class="course-info">
               <div class="course-name">{{ course.name }}</div>
@@ -88,21 +94,21 @@ const studyCourses = ref([
     teacher: "老师1",
     id: "Xxxxxxxxx",
     description: "课程1的描述",
-    image: "../assets/course.jpg",
+    image: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
   },
   {
     name: "课程2",
     teacher: "老师2",
     id: "Xxxxxxxxx",
     description: "课程2的描述",
-    image: "../assets/course.jpg",
+    image: "../assets/course.jpeg",
   },
   {
     name: "课程3",
     teacher: "老师3",
     id: "Xxxxxxxxx",
     description: "课程3的描述",
-    image: "../assets/course.jpg",
+    image: "../assets/course.jpeg",
   },
   {
     name: "课程4",
@@ -214,13 +220,16 @@ const options = ref([
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    max-height: calc(100vh - 156px);
+    max-height: calc(100vh - 138px);
     overflow-y: auto;
     .course-item {
-      .course-image {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
+      :deep(.el-card__body) {
+        padding: 0 !important;
+        .course-image {
+          width: 100%;
+          height: 192px;
+          cursor: pointer;
+        }
       }
       .course-info {
         display: flex;
