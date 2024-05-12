@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
@@ -12,11 +11,12 @@ export default defineConfig({
     },
   },
   server: {
-    port: 1024,
+    port: 2048,
     hmr: true,
+    cors: true,
     proxy: {
       "/api": {
-        target: "http://localhost:7090/",
+        target: "https://mock.presstime.cn/mock/66371c11d4a8a220672371be",
         changeOrigin: true,
         pathRewrite: {
           "^api": "/api",

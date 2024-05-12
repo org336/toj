@@ -83,8 +83,6 @@ video {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 100%;
-  font: inherit;
   vertical-align: baseline;
 }
 
@@ -94,11 +92,10 @@ html {
   font-family: Inter, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   overflow-y: auto;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  ::-webkit-scrollbar {
-    display: none;
-  }
+}
+body.el-popup-parent--hidden {
+  overflow: visible !important;
+  width: auto !important;
 }
 // 去除列表样式
 ul,

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.VITE_BASE_URL),
   routes: [
     {
       path: "/login",
@@ -15,55 +15,74 @@ const router = createRouter({
         {
           path: "",
           name: "HomePage",
-          component: () => import("@/views/home-page.vue"),
+          component: () => import("@/views/main/home-page.vue"),
         },
         {
           path: "/profile",
-          name: "Profile",
-          component: () => import("@/views/user-profile.vue"),
+          name: "UserProfile",
+          component: () => import("@/views/profile/user-profile.vue"),
           children: [
             {
               path: "",
               name: "ProfileMain",
-              component: () => import("@/views/profile-main.vue"),
+              component: () => import("@/views/profile/profile-basic.vue"),
             },
             {
               path: "identity",
               name: "ProfileIdentity",
-              component: () => import("@/views/profile-identity.vue"),
+              component: () => import("@/views/profile/profile-identity.vue"),
             },
             {
-              path: "updatePwd",
-              name: "ProfileUpdatePwd",
-              component: () => import("@/views/profile-updatePwd.vue"),
+              path: "pwd",
+              name: "ProfilePwd",
+              component: () => import("@/views/profile/profile-pwd.vue"),
             },
           ],
         },
 
         {
-          path: "/email",
-          name: "UserEmail",
-          component: () => import("@/views/user-email.vue"),
+          path: "/message",
+          name: "UserMessage",
+          component: () => import("@/views/message/user-message.vue"),
+          children: [
+            {
+              path: "personal",
+              name: "MessagePersonal",
+              component: () => import("@/views/message/message-personal.vue"),
+            },
+            {
+              path: "teacher",
+              name: "MessageTeacher",
+              component: () => import("@/views/message/messgae-teacher.vue"),
+            },
+            {
+              path: "system",
+              name: "MessageSystem",
+              component: () => import("@/views/message/message-system.vue"),
+            },
+            {
+              path: "my",
+              name: "MessageMy",
+              component: () => import("@/views/message/message-my.vue"),
+            },
+            {
+              path: "setting",
+              name: "MessageSetting",
+              component: () => import("@/views/message/message-setting.vue"),
+            },
+          ],
         },
         {
           path: "/course",
           name: "CoursePage",
-          component: () => import("@/views/course-page.vue"),
+          component: () => import("@/views/course/course-page.vue"),
         },
         {
           path: "/class",
           name: "ClassPage",
-          component: () => import("@/views/class-page.vue"),
+          component: () => import("@/views/class/class-page.vue"),
         },
       ],
-      /*
-      beforeEnter: (to, from, next) => {
-        if (store.state.isLoggedIn) {
-          next();
-        } else {
-          next({ name: "Login" });
-        }
-      },*/
     },
     {
       path: "/:pathMatch(.*)*",

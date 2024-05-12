@@ -23,7 +23,7 @@
                 <el-input v-model.trim="resetForm.emailCode" placeholder="验证码" />
               </el-form-item>
             </div>
-            <el-button type="primary" class="btn" round @click="sendEmailCode">
+            <el-button type="primary" class="btn" round @click="sendEmailCode(resetForm.email)">
               发送验证码
             </el-button>
           </div>
@@ -57,7 +57,7 @@
             <el-button
               type="primary"
               :loading="resetLoading"
-              @click="reset(resetForm)"
+              @click="reset(resetForm.value)"
               class="btn form"
               round
             >
@@ -99,7 +99,7 @@
             <el-button
               type="primary"
               :loading="loginLoading"
-              @click="Login(loginForm)"
+              @click="Login(loginForm.value)"
               class="btn form"
               round
             >
@@ -154,7 +154,7 @@
           <el-button
             type="primary"
             :loading="signUploading"
-            @click="SignUp(signUpForm)"
+            @click="SignUp(signUpForm.value)"
             class="btn form"
             round
           >
@@ -193,7 +193,9 @@
 
 <script setup>
 import { ElMessage } from "element-plus";
-import Verify from "../components/verifition/Verify.vue";
+import { UserService } from "@/utils/api";
+import { showMessage } from "@/utils/status";
+import Verify from "@/components/verifition/Verify.vue";
 import { ref, getCurrentInstance, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
@@ -206,7 +208,7 @@ const loginRef = ref(null);
 const signUpRef = ref(null);
 const resetRef = ref(null);
 const loginForm = ref({
-  name: "",
+  email: "",
   password: "",
 });
 const signUpForm = ref({
@@ -288,19 +290,21 @@ const resetRules = {
   ],
 };
 const Login = (formData) => {
-  //滑动框验证
-  onShow("blockPuzzle");
   loginRef.value.validate((valid) => {
     if (valid) {
-      loginLoading.value = true;
       // TODO: axios 登录请求
-      setTimeout(() => {
-        ElMessage.success("登录成功");
-        loginLoading.value = false;
-      }, 5000);
+      //滑动框验证
+      //onShow("blockPuzzle");
+      UserService.login(formData).then((res) => {
+        if (res.status === 200) {
+          ElMessage.success("登录成功");
+          router.push({ name: "Home" });
+        } else {
+          ElMessage.error(showMessage(res.status));
+        }
+      });
     }
   });
-  router.push({ name: "Home" });
 };
 
 const SignUp = (formData) => {
@@ -308,11 +312,8 @@ const SignUp = (formData) => {
     if (valid) {
       signUploading.value = true;
       // TODO: axios 注册请求
-      setTimeout(() => {
         ElMessage.success("注册成功");
         signUpRef.value.resetFields();
-        showSignIn();
-      }, 500);
     }
   });
   signUploading.value = false;

@@ -1,27 +1,28 @@
 <template>
   <div class="home">
-    <div class="nav">
+    <div class="nav" :class="extraClass">
       <div class="nav-start">
         <!-- 汉堡菜单图标 -->
-        <button class="hamburger" @click="toggleLeftSidebar">
+        <div class="hamburger" @click="toggleLeftSidebar">
           <i class="fas fa-bars"></i>
-        </button>
-        <div class="top-icon"><img src="../assets/whale.png" /></div>
-        <div class="top-name">蓝鲸</div>
+        </div>
+        <div class="top-icon"><img src="../assets/icons/whale.png" /></div>
+        <div class="top-name" @click="backToHome">BlueWhale</div>
       </div>
       <div class="nav-middle"></div>
       <div class="nav-end">
-        <!-- 搜索框 -->
-        <el-input placeholder="搜索一下">
-          <template #prefix><i class="fas fa-search"></i></template>
-        </el-input>
+        <!-- 搜索图标 -->
+        <div class="search-icon">
+          <i class="fas fa-search"></i>
+        </div>
         <!-- 消息图标 -->
-        <div class="msg-bell">
+
+        <div class="msg-bell" @click="shiftMessage">
           <i class="fa-sharp fa-regular fa-bell"></i>
         </div>
 
         <!-- 用户头像 -->
-        <div class="avatar">
+        <div class="avatar" @click="shiftProfile">
           <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
         </div>
         <div class="right-arrow" @click="toggleRightSidebar">
@@ -41,7 +42,7 @@
         class="drawer left-drawer"
       >
         <div class="sidebar-top">
-          <div class="siderbar-icon"><img src="../assets/whale.png" alt="" /></div>
+          <div class="siderbar-icon"><img src="@/assets/icons/whale.png" alt="" /></div>
           <div class="leave" @click="toggleLeftSidebar">
             <i class="fas fa-times"></i>
           </div>
@@ -68,7 +69,7 @@
       >
         <div class="sidebar-top">
           <div class="user">
-            <div class="user-avatar">
+            <div class="user-avatar" @click="">
               <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
             </div>
             <div class="user-name">{{ profile.username }}</div>
@@ -85,7 +86,7 @@
             <el-menu-item index="/profile">
               <i class="fa-regular fa-user"></i> 个人信息
             </el-menu-item>
-            <el-menu-item index="/email">
+            <el-menu-item index="/message">
               <i class="fa-regular fa-envelope"></i>邮箱消息</el-menu-item
             >
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
@@ -106,23 +107,6 @@
         </div>
       </el-drawer>
     </div>
-    <template>
-      <el-backtop @click="">
-        <div
-          style="
-            height: 100%;
-            width: 100%;
-            background-color: var(--el-bg-color-overlay);
-            box-shadow: var(--el-box-shadow-lighter);
-            text-align: center;
-            line-height: 40px;
-            color: #1989fa;
-          "
-        >
-          回到顶部
-        </div>
-      </el-backtop>
-    </template>
 
     <div class="main"><router-view></router-view></div>
     <div class="footer"></div>
@@ -130,13 +114,31 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch, watchEffect } from "vue";
+import { ref, getCurrentInstance, watch, watchEffect, computed } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
+//处理导航栏的样式变化
+const isExtra = ref(false);
+const checkScroll = () => {
+  isExtra.value = window.scrollY > 64;
+};
+const isHomePage = computed(() => route.path === "/");
+const extraClass = computed(() => (isHomePage.value && !isExtra.value ? "extra" : ""));
+watch(
+  isHomePage,
+  (newVal, oldVal) => {
+    if (newVal) {
+      window.addEventListener("scroll", checkScroll);
+    } else if (oldVal) {
+      window.removeEventListener("scroll", checkScroll);
+    }
+  },
+  { immediate: true }
+);
 // 处理左边栏和右边栏的开关逻辑
 const leftDrawer = ref(false);
 const rightDrawer = ref(false);
@@ -156,10 +158,20 @@ watch(router.currentRoute, () => {
   leftDrawer.value = false;
   rightDrawer.value = false;
 });
-
+//返回主页
+const backToHome = () => {
+  router.push("/");
+};
 //处理右边栏的数据
 const store = useUserStore();
 const { profile } = storeToRefs(store);
+//点击切换用户消息
+const shiftMessage = () => {
+  router.push("/message");
+};
+const shiftProfile = () => {
+  router.push("/profile");
+};
 </script>
 
 <style lang="scss" scoped>
