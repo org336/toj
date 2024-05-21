@@ -41,8 +41,8 @@ const images = [
   },
   {
     url: art_5,
-    title: "The Starry Night",
-    desc: { author: "Vincent van Gogh", time: "1889" },
+    title: "Seascape near Les Saintes",
+    desc: { author: "Vincent van Gogh", time: "1888" },
   },
   {
     url: art_6,

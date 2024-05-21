@@ -289,20 +289,20 @@ const resetRules = {
     },
   ],
 };
-const Login = (formData) => {
+const Login = async (formData) => {
   loginRef.value.validate((valid) => {
     if (valid) {
       // TODO: axios 登录请求
       //滑动框验证
       //onShow("blockPuzzle");
-      UserService.login(formData).then((res) => {
-        if (res.status === 200) {
-          ElMessage.success("登录成功");
-          router.push({ name: "Home" });
-        } else {
-          ElMessage.error(showMessage(res.status));
-        }
-      });
+      UserService.login(formData)
+        .then((res) => {
+          if (res.status === 200) {
+            ElMessage.success("登录成功");
+            router.push({ name: "Home" });
+          }
+        })
+        .catch((error) => {});
     }
   });
 };
@@ -312,8 +312,8 @@ const SignUp = (formData) => {
     if (valid) {
       signUploading.value = true;
       // TODO: axios 注册请求
-        ElMessage.success("注册成功");
-        signUpRef.value.resetFields();
+      ElMessage.success("注册成功");
+      signUpRef.value.resetFields();
     }
   });
   signUploading.value = false;

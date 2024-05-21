@@ -5,21 +5,27 @@ import { request } from "./axios";
  */
 export class UserService {
   static async login(params) {
-    return request("/user/login", params, "POST");
+    return request("/user/session", params, "POST");
   }
   static async register(params) {
     return request("/user/profile", params, "POST");
   }
-  static async register(params) {
+  static async updateProfile(params) {
     return request("/user/profile", params, "PUT");
   }
   static async reset(params) {
-    return request("/user/password", params, "PUT");
+    return request("/password", params, "PUT");
+  }
+  static async getMessages(params, type) {
+    return request(`/messages/${type}`, params, "GET");
   }
 }
 
 export class CourseService {
   static async addCourse(params) {
-    return request("/courses", params, "get");
+    return request("/courses", params, "POST");
+  }
+  static async getCourses(params) {
+    return request("/courses", params, "GET");
   }
 }

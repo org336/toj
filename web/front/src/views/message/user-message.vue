@@ -27,19 +27,22 @@
 
 <script setup>
 import router from "@/router";
-import { ref, getCurrentInstance, reactive } from "vue";
-const { proxy } = getCurrentInstance();
+import { ref, reactive } from "vue";
+import { useUserStore } from "@/store/user";
+import { storeToRefs } from "pinia";
+const store = useUserStore();
+const { profile } = storeToRefs(store);
 const messgaeTypes = reactive({
   personal: "私人消息",
   teacher: "老师消息",
   system: "系统通知",
-  setting: "消息设置",
   my: "我的消息",
+  setting: "消息设置",
 });
-const selectedMenu = ref("");
+const selectedMenu = ref("personal");
 const handleSelect = (index) => {
-  selectedMenu.value = messgaeTypes[index];
-  router.push({ path: `/message/${index}` });
+  selectedMenu.value = index;
+  router.push({ path: `/message/${selectedMenu.value}` });
 };
 </script>
 
@@ -47,7 +50,6 @@ const handleSelect = (index) => {
 .msg {
   display: flex;
   width: 70%;
-  height: calc(100vh - 74px);
   margin: 74px auto;
   background-color: #f5f5f5;
   .space-left {
@@ -93,12 +95,13 @@ const handleSelect = (index) => {
       font-size: 16px;
       height: 44px;
       line-height: 44px;
-      border-radius: 6px;
       background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px 0 rgba(121, 146, 185, 0.54);
     }
     .content {
+      max-height: calc(100vh - 74px - 44px);
       background-color: #fff;
-      padding: 0 16px;
     }
   }
 }

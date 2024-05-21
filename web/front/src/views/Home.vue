@@ -86,7 +86,7 @@
             <el-menu-item index="/profile">
               <i class="fa-regular fa-user"></i> 个人信息
             </el-menu-item>
-            <el-menu-item index="/message">
+            <el-menu-item index="/message/personal">
               <i class="fa-regular fa-envelope"></i>邮箱消息</el-menu-item
             >
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
@@ -114,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch, watchEffect, computed } from "vue";
+import { ref, getCurrentInstance, watch, watchEffect, computed, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
@@ -167,11 +167,15 @@ const store = useUserStore();
 const { profile } = storeToRefs(store);
 //点击切换用户消息
 const shiftMessage = () => {
-  router.push("/message");
+  router.push("/message/personal");
 };
 const shiftProfile = () => {
   router.push("/profile");
 };
+//主动加载home-page组件
+onMounted(() => {
+  router.push("/");
+});
 </script>
 
 <style lang="scss" scoped>

@@ -33,7 +33,7 @@ const router = createRouter({
               component: () => import("@/views/profile/profile-identity.vue"),
             },
             {
-              path: "pwd",
+              path: "password",
               name: "ProfilePwd",
               component: () => import("@/views/profile/profile-pwd.vue"),
             },

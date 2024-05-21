@@ -7,7 +7,7 @@
           <el-menu-item index="/profile/identity">
             <i class="fas fa-id-card"></i> 身份认证
           </el-menu-item>
-          <el-menu-item index="/profile/pwd">
+          <el-menu-item index="/profile/password">
             <i class="fas fa-key"></i> 修改密码
           </el-menu-item>
         </el-menu>
@@ -21,9 +21,6 @@
 
 <script setup>
 import { ref, getCurrentInstance } from "vue";
-import { useRouter, useRoute } from "vue-router";
-const router = useRouter();
-const route = useRoute();
 </script>
 
 <style lang="scss" scoped>
