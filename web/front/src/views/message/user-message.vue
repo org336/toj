@@ -17,7 +17,7 @@
     </div>
 
     <div class="space-right">
-      <div class="title">{{ selectedMenu }}</div>
+      <div class="title">{{ messgaeTypes[selectedMenu] }}</div>
       <div class="content">
         <router-view></router-view>
       </div>
@@ -27,29 +27,32 @@
 
 <script setup>
 import router from "@/router";
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 const store = useUserStore();
 const { profile } = storeToRefs(store);
-const messgaeTypes = reactive({
+const messgaeTypes = {
   personal: "私人消息",
   teacher: "老师消息",
   system: "系统通知",
   my: "我的消息",
   setting: "消息设置",
-});
+};
 const selectedMenu = ref("personal");
 const handleSelect = (index) => {
   selectedMenu.value = index;
   router.push({ path: `/message/${selectedMenu.value}` });
 };
+onMounted(() => {
+  document.body.style.overflow = "hidden";
+});
 </script>
 
 <style lang="scss" scoped>
 .msg {
   display: flex;
-  width: 70%;
+  width: 60%;
   margin: 74px auto;
   background-color: #f5f5f5;
   .space-left {
@@ -88,6 +91,7 @@ const handleSelect = (index) => {
     justify-content: flex-start;
     width: 100%;
     margin: 0 10px;
+    margin-bottom: 10px;
     .title {
       margin: 10px 0;
       align-items: center;
@@ -101,7 +105,7 @@ const handleSelect = (index) => {
     }
     .content {
       max-height: calc(100vh - 74px - 44px);
-      background-color: #fff;
+      overflow-y: auto;
     }
   }
 }

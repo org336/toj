@@ -91,11 +91,13 @@ html {
   font-size: 14px;
   font-family: Inter, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  overflow-y: auto;
 }
 body.el-popup-parent--hidden {
   overflow: visible !important;
   width: auto !important;
+}
+.body {
+  overflow-y: auto;
 }
 // 去除列表样式
 ul,

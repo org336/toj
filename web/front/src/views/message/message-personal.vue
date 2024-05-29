@@ -94,7 +94,7 @@ onMounted(() => {
   padding: 24px 16px;
   background-color: #fff;
   box-shadow: 0 2px 4px 0 rgba(121, 146, 185, 0.54);
-  border-radius: 4px;
+  border-radius: 6px;
   .card {
     padding-top: 24px;
     padding-bottom: 24px;
@@ -121,16 +121,14 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        color: #222;
         .line-1 {
           .name {
             font-weight: 600;
             margin-right: 12px;
-            color: #222;
           }
         }
-        .line-2 {
-          color: #222;
-        }
+
         .line-3 {
           display: flex;
           justify-content: start;
