@@ -5,7 +5,7 @@
     "lib": ["ESNext"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "module": "commonjs",
     "paths": {
       "~/*": ["src/*"]
