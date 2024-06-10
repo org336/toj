@@ -2,18 +2,21 @@ import { Entity, Column, PrimaryColumn, Unique } from 'typeorm';
 
 @Entity('teacher')
 @Unique(['email'])
-export class Teacher {
-  @PrimaryColumn({ type: 'varchar', length: 64, comment: '老师唯一标识符' })
+export class TeacherEntity {
+  @PrimaryColumn({ type: 'varchar', length: 36, comment: '老师唯一标识符' })
   uid: string;
+
+  @Column({ type: 'varchar', length: 16, comment: '教职工号' })
+  teacher_id: string;
 
   @Column({ type: 'varchar', length: 64, comment: '邮箱' })
   email: string;
 
   @Column({ type: 'varchar', length: 16, comment: '用户名称' })
-  username: string;
+  nick_name: string;
 
   @Column({ type: 'varchar', length: 16, comment: '教师真实姓名' })
-  full_name: string;
+  real_name: string;
 
   @Column({ type: 'varchar', length: 60, comment: '加密后的密码' })
   password: string;

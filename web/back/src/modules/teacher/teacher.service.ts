@@ -1,34 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Teacher } from './teacher.entity';
+import { TeacherEntity } from './teacher.entity';
 
 @Injectable()
 export class TeacherService {
   constructor(
-    @InjectRepository(Teacher)
-    private teacherRepository: Repository<Teacher>,
+    @InjectRepository(TeacherEntity)
+    private TeacherEntityRepository: Repository<TeacherEntity>,
   ) {}
 
-  async findAll(): Promise<Teacher[]> {
-    return await this.teacherRepository.find();
+  async findAll(): Promise<TeacherEntity[]> {
+    return await this.TeacherEntityRepository.find();
   }
 
-  async findOne(uid: string): Promise<Teacher> {
-    return await this.teacherRepository.findOne({ where: { uid } });
+  async findOne(uid: string): Promise<TeacherEntity> {
+    return await this.TeacherEntityRepository.findOne({ where: { uid } });
   }
 
-  async create(teacherData: Partial<Teacher>): Promise<Teacher> {
-    const teacher = this.teacherRepository.create(teacherData);
-    return await this.teacherRepository.save(teacher);
+  async create(
+    TeacherEntityData: Partial<TeacherEntity>,
+  ): Promise<TeacherEntity> {
+    const TeacherEntity =
+      this.TeacherEntityRepository.create(TeacherEntityData);
+    return await this.TeacherEntityRepository.save(TeacherEntity);
   }
 
-  async update(uid: string, teacherData: Partial<Teacher>): Promise<Teacher> {
-    await this.teacherRepository.update(uid, teacherData);
-    return await this.teacherRepository.findOne({ where: { uid } });
+  async update(
+    uid: string,
+    TeacherEntityData: Partial<TeacherEntity>,
+  ): Promise<TeacherEntity> {
+    await this.TeacherEntityRepository.update(uid, TeacherEntityData);
+    return await this.TeacherEntityRepository.findOne({ where: { uid } });
   }
 
   async remove(uid: string): Promise<void> {
-    await this.teacherRepository.delete(uid);
+    await this.TeacherEntityRepository.delete(uid);
   }
 }

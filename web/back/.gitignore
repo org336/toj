@@ -16,8 +16,8 @@ yarn-error.log*
 # Nest.js
 dist/
 *.local
-*.env
-
+*.env.development
+*.env.production
 # Dependency directories
 node_modules/
 
