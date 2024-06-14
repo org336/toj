@@ -3,11 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './shared/database/database.module';
 import { StudentModule } from './modules/student/student.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
-import { AuthService } from './modules/auth/auth.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ApiInterceptor } from './common/interceptors/api.interceptor';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
+import { SharedModule } from './shared/shared.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +15,7 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter';
       expandVariables: true,
       envFilePath: ['.env.development'],
     }),
+    SharedModule,
     DatabaseModule,
     StudentModule,
     TeacherModule,

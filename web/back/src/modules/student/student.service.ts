@@ -1,19 +1,34 @@
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  BadRequestException,
+  HttpStatus,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudentEntity } from './student.entity';
 import { BcryptUtils } from '~/utils/encrypt.util';
-import * as jwt from 'jsonwebtoken';
-import * as nodemailer from 'nodemailer';
 import { v1 as uuidv1 } from 'uuid';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
+import { EmailService } from '~/shared/mailer/email.service';
 export class StudentService {
   constructor(
     @InjectRepository(StudentEntity)
     private readonly studentRepository: Repository<StudentEntity>,
+    private readonly emailService: EmailService,
   ) {}
-
+  async findOne(email: string) {
+    const user = await this.studentRepository.findOne({
+      where: { email },
+    });
+    if (!user)
+      throw new ApiException(
+        '找不到该用户',
+        ApiCode.NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
+    return user;
+  }
   async register(student: {
     email: string;
     studentId: string;
@@ -24,31 +39,17 @@ export class StudentService {
     });
 
     if (existingStudent) {
-      throw new ApiException('邮箱已被使用', ApiCode.PARAMS_ERROR, 200);
+      throw new ApiException(
+        '邮箱已被使用',
+        ApiCode.PARAMS_ERROR,
+        HttpStatus.CONFLICT,
+      );
     }
     const uid = uuidv1();
     student.password = await BcryptUtils.hashPassword(student.password);
     const newStudent = this.studentRepository.create({ ...student, uid });
+    await this.studentRepository.save(newStudent);
     return { uid, email: student.email };
-  }
-
-  async login(credentials: { email: string; password: string }) {
-    const student = await this.studentRepository.findOne({
-      where: { email: credentials.email },
-    });
-    if (!student) {
-      throw new ApiException('找不到该用户', ApiCode.SIGN_ERROR, 200);
-    }
-    const isMatch = await BcryptUtils.comparePassword(
-      credentials.password,
-      student.password,
-    );
-    if (!isMatch) {
-      throw new ApiException('密码错误', ApiCode.PARAMS_ERROR, 200);
-    }
-    const payload = { uid: student.uid, email: student.email };
-    const token = jwt.sign(payload, 'your_jwt_secret', { expiresIn: '1h' });
-    return { token };
   }
 
   async changePassword(data: {
@@ -72,13 +73,7 @@ export class StudentService {
     student.password = await BcryptUtils.hashPassword(data.newPassword);
     return await this.studentRepository.save(student);
   }
-
   async sendEmailCode(email: string) {
-    // 生成一个随机的验证码
-    // 存储验证码到数据库或缓存中
-    // await this.storeVerificationCode(email, code);
-    // 创建一个邮件传输器
-    // 设置邮件内容
-    // 发送邮件
+    return this.emailService.sendEmailCode(email);
   }
 }
