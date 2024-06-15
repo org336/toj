@@ -16,8 +16,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof ApiException) {
       response.status(status).json({
-        msg: (exception as ApiException).getErrorMessage(),
         code: (exception as ApiException).gerErrorCode(),
+        msg: (exception as ApiException).getErrorMessage(),
         path: request.url,
       });
     } else {

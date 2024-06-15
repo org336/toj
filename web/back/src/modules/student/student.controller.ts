@@ -9,7 +9,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { EmailService } from '~/shared/mailer/email.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 @ApiTags('student')
@@ -63,7 +62,7 @@ export class StudentController {
     },
   })
   @Post('email')
-  async sendEmailCode(@Body() email: string) {
-    return await this.studentService.sendEmailCode(email);
+  async sendEmailCode(@Body() data: { email: string }) {
+    return await this.studentService.sendEmailCode(data.email);
   }
 }

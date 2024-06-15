@@ -61,14 +61,22 @@ export class StudentService {
     // Assuming a simple mock verification for the sake of example
     const codeValid = data.code === '123456'; // This should be replaced with actual code validation
     if (!codeValid) {
-      throw new BadRequestException('Invalid verification code');
+      throw new ApiException(
+        '邮箱验证码错误',
+        ApiCode.PARAMS_ERROR,
+        HttpStatus.CONFLICT,
+      );
     }
 
     const student = await this.studentRepository.findOne({
       where: { email: data.email },
     });
     if (!student) {
-      throw new NotFoundException('Student not found');
+      throw new ApiException(
+        '用户不存在',
+        ApiCode.NOT_FOUND,
+        HttpStatus.CONFLICT,
+      );
     }
     student.password = await BcryptUtils.hashPassword(data.newPassword);
     return await this.studentRepository.save(student);

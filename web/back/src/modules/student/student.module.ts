@@ -7,7 +7,7 @@ import { EmailModule } from '~/shared/mailer/email.module';
 @Module({
   controllers: [StudentController],
   providers: [StudentService],
-  imports: [EmailModule, TypeOrmModule.forFeature([StudentEntity])],
+  imports: [TypeOrmModule.forFeature([StudentEntity]), EmailModule],
   exports: [StudentService],
 })
 export class StudentModule {}

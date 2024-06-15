@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailService } from './email.service';
-import { RedisService } from '../redis/redis.service';
+import path from 'path';
 @Module({
-  providers: [EmailService, RedisService],
+  providers: [EmailService],
   imports: [
     MailerModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         transport: {
           host: configService.get('SMTP_HOST'),
@@ -23,8 +24,8 @@ import { RedisService } from '../redis/redis.service';
         },
         preview: false,
         template: {
-          dir: process.cwd() + '/template/',
-          adapter: new PugAdapter(),
+          dir: path.join(__dirname, 'template'),
+          adapter: new EjsAdapter(),
           options: {
             strict: true,
           },
