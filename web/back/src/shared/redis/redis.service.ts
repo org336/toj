@@ -7,12 +7,11 @@ export class RedisService {
     return await this.redisClient.get(key);
   }
 
-  async set(key: string, value: string, expire?: number): Promise<void> {
-    if (expire) {
-      await this.redisClient.set(key, value, 'EX', expire);
-    } else {
-      await this.redisClient.set(key, value);
-    }
+  async setEx(key: string, value: string, expire: number): Promise<void> {
+    await this.redisClient.set(key, value, 'EX', expire);
+  }
+  async set(key: string, value: string): Promise<void> {
+    await this.redisClient.set(key, value);
   }
 
   async del(key: string): Promise<void> {
