@@ -23,14 +23,13 @@ export class EmailService {
     currentData: any,
     code: string,
     date: Date,
+    tomorrow: Date,
   ): Promise<void> {
-    // 更新数据
+    // 更新redis数据
     currentData.code = code;
     currentData.count = (currentData.count || 0) + 1;
     currentData.time = formatDateTime(new Date());
-    const tomorrow = new Date(date);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+
     const secondsUntilMidnight = (tomorrow.getTime() - date.getTime()) / 1000;
 
     // 存储更新后的数据，设置有效期持续到零点
@@ -42,7 +41,11 @@ export class EmailService {
   }
 
   // 检查是否可以发送邮件
-  private async canSendEmail(currentData: any, date: Date): Promise<void> {
+  private async canSendEmail(
+    currentData: any,
+    date: Date,
+    tomorrow: Date,
+  ): Promise<void> {
     if (Object.keys(currentData).length === 0) {
       return;
     }
@@ -54,9 +57,6 @@ export class EmailService {
       throw new ApiException('发送频率过高，请稍后再试', ApiCode.TIMEOUT, 200);
     }
     // 检查是否达到每日发送限制，每天最多发送5次
-    date.setDate(date.getDate() + 1);
-    date.setHours(0, 0, 0, 0);
-    const tomorrow = date;
     // 如果最后一次发送时间在今天，并且发送次数达到10次，不允许发送
     if (lastSendTime < tomorrow && currentData.count > 5) {
       throw new ApiException(
@@ -70,23 +70,29 @@ export class EmailService {
   // 使用模板发送验证码到指定邮箱
   async sendEmailCode(email: string): Promise<void> {
     const code = this.generateVerificationCode();
+    //当前时间
     const dateStr = formatDateTime(new Date());
-    const date = parseDateTime(dateStr);
+    const now = parseDateTime(dateStr);
+    //明天零点
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
     const emailKey = `emailcode:${email}`;
+    // key-value
     const currentDataRaw = await this.redisService.get(emailKey);
     let currentData = currentDataRaw ? JSON.parse(currentDataRaw) : {};
-    await this.canSendEmail(currentData, date);
+    await this.canSendEmail(currentData, now, tomorrow);
     try {
-      // await this.mailerService.sendMail({
-      //   to: email,
-      //   subject: '用户邮箱验证',
-      //   template: 'verify-code.ejs',
-      //   context: {
-      //     code: code,
-      //     date: dateStr,
-      //   },
-      // });
-      await this.storeEmailCode(emailKey, currentData, code, date);
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '用户邮箱验证',
+        template: 'verify-code.ejs',
+        context: {
+          code: code,
+          date: dateStr,
+        },
+      });
+      await this.storeEmailCode(emailKey, currentData, code, now, tomorrow);
     } catch (error) {
       throw new ApiException(error, ApiCode.BUSINESS_ERROR, 200);
     }
