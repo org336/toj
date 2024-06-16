@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 import { CustomRedisModule } from './shared/redis/redis.module';
 import { DatabaseModule } from './shared/database/database.module';
 import { StudentModule } from './modules/student/student.module';
@@ -8,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ApiInterceptor } from './common/interceptors/api.interceptor';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
+import { RecaptchaModule } from './shared/recaptcha/recaptcha.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +17,8 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter';
       expandVariables: true,
       envFilePath: ['.env.development'],
     }),
+    RecaptchaModule,
+    CommonModule,
     CustomRedisModule,
     DatabaseModule,
     StudentModule,

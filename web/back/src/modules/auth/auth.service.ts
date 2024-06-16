@@ -16,7 +16,7 @@ export class AuthService {
     email: string;
     password: string;
   }): Promise<any> {
-    const user = await this.userService.findOne(credentials.email);
+    const user = await this.userService.findOneByEmail(credentials.email);
     if (!user) {
       throw new ApiException(
         '找不到该用户',

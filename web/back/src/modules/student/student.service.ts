@@ -7,13 +7,15 @@ import { v1 as uuidv1 } from 'uuid';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
+import { CommonService } from '~/common/common.service';
 export class StudentService {
   constructor(
     @InjectRepository(StudentEntity)
     private readonly studentRepository: Repository<StudentEntity>,
     private readonly emailService: EmailService,
+    private readonly commonService: CommonService,
   ) {}
-  async findOne(email: string) {
+  async findOneByEmail(email: string) {
     const user = await this.studentRepository.findOne({
       where: { email },
     });
@@ -25,8 +27,10 @@ export class StudentService {
       );
     return user;
   }
+
   async register(student: {
     email: string;
+    emailCode: string;
     studentId: string;
     password: string;
   }): Promise<{ uid: string; email: string }> {
@@ -41,6 +45,8 @@ export class StudentService {
         HttpStatus.CONFLICT,
       );
     }
+    let emailKey = `emailCode:register:${student.email}`;
+    await this.commonService.verifyEmailCode(emailKey, student.emailCode);
     const uid = uuidv1();
     student.password = await BcryptUtils.hashPassword(student.password);
     const newStudent = this.studentRepository.create({ ...student, uid });
@@ -50,34 +56,17 @@ export class StudentService {
 
   async changePassword(data: {
     email: string;
-    code: string;
+    emailCode: string;
     newPassword: string;
-  }) {
-    // Here you would verify the code from your database or cache
-    // Assuming a simple mock verification for the sake of example
-    const codeValid = data.code === '123456'; // This should be replaced with actual code validation
-    if (!codeValid) {
-      throw new ApiException(
-        '邮箱验证码错误',
-        ApiCode.PARAMS_ERROR,
-        HttpStatus.CONFLICT,
-      );
-    }
+  }): Promise<void> {
+    const student = await this.findOneByEmail(data.email);
+    let emailKey = `emailCode:resetPwd:${data.email}`;
+    await this.commonService.verifyEmailCode(emailKey, data.emailCode);
 
-    const student = await this.studentRepository.findOne({
-      where: { email: data.email },
-    });
-    if (!student) {
-      throw new ApiException(
-        '用户不存在',
-        ApiCode.NOT_FOUND,
-        HttpStatus.CONFLICT,
-      );
-    }
     student.password = await BcryptUtils.hashPassword(data.newPassword);
-    return await this.studentRepository.save(student);
+    await this.studentRepository.save(student);
   }
-  async sendEmailCode(email: string) {
-    return this.emailService.sendEmailCode(email);
+  async sendEmailCode(email: string, func: string) {
+    return this.emailService.sendEmailCode(email, func);
   }
 }

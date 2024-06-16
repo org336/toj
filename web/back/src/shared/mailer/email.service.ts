@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { RedisService } from '../redis/redis.service';
 import { ApiException } from '~/constants/exception/api.exception';
@@ -54,21 +54,24 @@ export class EmailService {
 
     // 检查是否达到每分钟发送限制，每分钟最多发送1次
     if (60000 > difference) {
-      throw new ApiException('发送频率过高，请稍后再试', ApiCode.TIMEOUT, 200);
+      throw new ApiException(
+        '发送频率过高，请稍后再试',
+        ApiCode.TIMEOUT,
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
     // 检查是否达到每日发送限制，每天最多发送5次
-    // 如果最后一次发送时间在今天，并且发送次数达到10次，不允许发送
     if (lastSendTime < tomorrow && currentData.count > 5) {
       throw new ApiException(
         '今日发送次数已达上限',
         ApiCode.BUSINESS_ERROR,
-        200,
+        HttpStatus.FORBIDDEN,
       );
     }
   }
 
   // 使用模板发送验证码到指定邮箱
-  async sendEmailCode(email: string): Promise<void> {
+  async sendEmailCode(email: string, purpose: string): Promise<void> {
     const code = this.generateVerificationCode();
     //当前时间
     const dateStr = formatDateTime(new Date());
@@ -77,7 +80,7 @@ export class EmailService {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
-    const emailKey = `emailcode:${email}`;
+    const emailKey = `emailCode:${purpose}:${email}`;
     // key-value
     const currentDataRaw = await this.redisService.get(emailKey);
     let currentData = currentDataRaw ? JSON.parse(currentDataRaw) : {};
@@ -94,7 +97,11 @@ export class EmailService {
       });
       await this.storeEmailCode(emailKey, currentData, code, now, tomorrow);
     } catch (error) {
-      throw new ApiException(error, ApiCode.BUSINESS_ERROR, 200);
+      throw new ApiException(
+        error,
+        ApiCode.BUSINESS_ERROR,
+        HttpStatus.CONFLICT,
+      );
     }
   }
 }

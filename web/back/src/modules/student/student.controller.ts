@@ -22,6 +22,7 @@ export class StudentController {
     schema: {
       properties: {
         email: { type: 'string', example: '2959346375@qq.com' },
+        emailCode: { type: 'string', example: '123456' },
         studentId: { type: 'string', example: '1520223609' },
         password: { type: 'string', example: 'test123456!' },
       },
@@ -29,7 +30,13 @@ export class StudentController {
   })
   @Post('member')
   async register(
-    @Body() student: { email: string; studentId: string; password: string },
+    @Body()
+    student: {
+      email: string;
+      emailCode: string;
+      studentId: string;
+      password: string;
+    },
   ) {
     return await this.studentService.register(student);
   }
@@ -40,14 +47,14 @@ export class StudentController {
     schema: {
       properties: {
         email: { type: 'string', example: '2959346375@qq.com' },
-        code: { type: 'string', example: 'test123456!' },
+        emailCode: { type: 'string', example: '123456' },
         newPassword: { type: 'string', example: 'test123456~' },
       },
     },
   })
   @Put('password')
   async changePassword(
-    @Body() data: { email: string; code: string; newPassword: string },
+    @Body() data: { email: string; emailCode: string; newPassword: string },
   ) {
     return await this.studentService.changePassword(data);
   }
@@ -58,11 +65,12 @@ export class StudentController {
     schema: {
       properties: {
         email: { type: 'string', example: '2959346375@qq.com' },
+        purpose: { type: 'string', example: 'register/resetPwd' },
       },
     },
   })
   @Post('email')
-  async sendEmailCode(@Body() data: { email: string }) {
-    return await this.studentService.sendEmailCode(data.email);
+  async sendEmailCode(@Body() data: { email: string; purpose: string }) {
+    return await this.studentService.sendEmailCode(data.email, data.purpose);
   }
 }
