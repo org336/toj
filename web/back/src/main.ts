@@ -4,6 +4,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: 'http://localhost:2048', // 前端域名
+    credentials: true, // 允许前端请求携带凭证
+  });
   app.setGlobalPrefix('api');
   const options = new DocumentBuilder()
     .setTitle('后端接口模拟')

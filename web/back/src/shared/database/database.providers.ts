@@ -1,7 +1,6 @@
 import { TypeOrmModuleOptions, TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { StudentEntity } from '../../modules/student/student.entity';
-import { TeacherEntity } from '../../modules/teacher/teacher.entity';
+import { UserEntity } from '../../modules/user/user.entity';
 export const DatabaseProviders = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
   useFactory: async (
@@ -13,7 +12,7 @@ export const DatabaseProviders = TypeOrmModule.forRootAsync({
     username: configService.get<string>('DB_USERNAME'),
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_DATABASE'),
-    entities: [StudentEntity, TeacherEntity],
+    entities: [UserEntity],
     synchronize: configService.get<string>('NODE_ENV') === 'development', // 仅在开发环境中启用
   }),
 

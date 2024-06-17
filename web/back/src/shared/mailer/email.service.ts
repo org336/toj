@@ -16,7 +16,36 @@ export class EmailService {
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 生成六位随机数
     return code;
   }
+  // 校验邮箱验证码
+  async verifyEmailCode(emailKey: string, emailCode: string): Promise<void> {
+    let currentDataRaw = await this.redisService.get(emailKey);
+    const currentData = currentDataRaw ? JSON.parse(currentDataRaw) : {};
+    if (Object.keys(currentData).length === 0) {
+      throw new ApiException(
+        '验证码不存在，请重新发送',
+        ApiCode.NOT_FOUND,
+        HttpStatus.CONFLICT,
+      );
+    }
+    const now = new Date();
+    const codeTime = parseDateTime(currentData.time);
+    const timeDiff = now.getTime() - codeTime.getTime();
 
+    if (timeDiff > 600000) {
+      throw new ApiException(
+        '验证码已过期',
+        ApiCode.TIMEOUT,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (currentData.code !== emailCode) {
+      throw new ApiException(
+        '邮箱验证码错误',
+        ApiCode.PARAMS_ERROR,
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
   // 存储验证码到Redis中，并记录发送次数和时间
   private async storeEmailCode(
     emailKey: string,

@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { RecaptchaService } from './recaptcha.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+@ApiTags('recaptcha')
 @Controller('users')
 export class RecaptchaController {
   constructor(private readonly recaptchaService: RecaptchaService) {}

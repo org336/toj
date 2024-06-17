@@ -8,13 +8,13 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { StudentService } from './student.service';
+import { UserService } from './user.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-@ApiTags('student')
+@ApiTags('user')
 @Controller('users')
 export class StudentController {
-  constructor(private studentService: StudentService) {}
+  constructor(private userService: UserService) {}
   // 注册新用户
   @ApiBody({
     description: '用户注册提交的信息',
@@ -23,7 +23,7 @@ export class StudentController {
       properties: {
         email: { type: 'string', example: '2959346375@qq.com' },
         emailCode: { type: 'string', example: '123456' },
-        studentId: { type: 'string', example: '1520223609' },
+        userId: { type: 'string', example: '1520223609' },
         password: { type: 'string', example: 'test123456!' },
       },
     },
@@ -31,14 +31,14 @@ export class StudentController {
   @Post('member')
   async register(
     @Body()
-    student: {
+    user: {
       email: string;
       emailCode: string;
-      studentId: string;
+      userId: string;
       password: string;
     },
   ) {
-    return await this.studentService.register(student);
+    return await this.userService.register(user);
   }
   // 修改用户密码
   @ApiBody({
@@ -56,7 +56,7 @@ export class StudentController {
   async changePassword(
     @Body() data: { email: string; emailCode: string; newPassword: string },
   ) {
-    return await this.studentService.changePassword(data);
+    return await this.userService.changePassword(data);
   }
   // 发送邮箱验证码
   @ApiBody({
@@ -71,6 +71,6 @@ export class StudentController {
   })
   @Post('email')
   async sendEmailCode(@Body() data: { email: string; purpose: string }) {
-    return await this.studentService.sendEmailCode(data.email, data.purpose);
+    return await this.userService.sendEmailCode(data.email, data.purpose);
   }
 }

@@ -3,8 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { CustomRedisModule } from './shared/redis/redis.module';
 import { DatabaseModule } from './shared/database/database.module';
-import { StudentModule } from './modules/student/student.module';
-import { TeacherModule } from './modules/teacher/teacher.module';
+import { StudentModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ApiInterceptor } from './common/interceptors/api.interceptor';
@@ -22,7 +21,6 @@ import { RecaptchaModule } from './shared/recaptcha/recaptcha.module';
     CustomRedisModule,
     DatabaseModule,
     StudentModule,
-    TeacherModule,
     AuthModule,
   ],
   controllers: [],

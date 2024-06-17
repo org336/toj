@@ -4,11 +4,11 @@ import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { HttpStatus } from '@nestjs/common';
 import { BcryptUtils } from '~/utils/encrypt.util';
-import { StudentService } from '../student/student.service';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: StudentService,
+    private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
