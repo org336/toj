@@ -39,6 +39,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 10px;
   .card {
     border-radius: 6px;
     background-color: #fff;

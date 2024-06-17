@@ -1,4 +1,5 @@
 <template>
+  <popup-view ref="popupRef"></popup-view>
   <div class="container" ref="containerRef">
     <div class="forms-container">
       <div class="signin-signup">
@@ -8,6 +9,7 @@
           :rules="resetRules"
           class="reset-form"
           v-if="showResetForm"
+          @submit.prevent
         >
           <h2 class="title">重置密码</h2>
           <div class="input-field">
@@ -34,7 +36,6 @@
                 v-model.trim="resetForm.password"
                 type="password"
                 placeholder="新密码"
-                autocomplete="off"
                 show-password
                 clearable
               />
@@ -47,7 +48,6 @@
                 v-model.trim="resetForm.confirmPassword"
                 type="password"
                 placeholder="确认新密码"
-                autocomplete="off"
                 show-password
                 clearable
               />
@@ -74,6 +74,7 @@
           :rules="loginRules"
           class="sign-in-form"
           v-if="!showResetForm"
+          @submit.prevent
         >
           <h2 class="title">登录</h2>
           <div class="input-field">
@@ -89,12 +90,12 @@
                 v-model.trim="loginForm.password"
                 type="password"
                 placeholder="密码"
-                autocomplete="off"
                 show-password
                 clearable
               />
             </el-form-item>
           </div>
+          <recaptcha-view ref="recaptchaRef"></recaptcha-view>
           <div class="reset-line">
             <el-button
               type="primary"
@@ -111,7 +112,13 @@
           </div>
         </el-form>
 
-        <el-form ref="signUpRef" :model="signUpForm" :rules="signUpRules" class="sign-up-form">
+        <el-form
+          ref="signUpRef"
+          :model="signUpForm"
+          :rules="signUpRules"
+          class="sign-up-form"
+          @submit.prevent
+        >
           <h2 class="title">注册</h2>
           <div class="input-field">
             <i class="fa-solid fa-user"></i>
@@ -119,10 +126,21 @@
               <el-input v-model.trim="signUpForm.email" clearable placeholder="邮箱" />
             </el-form-item>
           </div>
+          <div class="emailCode-row">
+            <div class="input-field emailCode">
+              <i class="fas fa-envelope"></i>
+              <el-form-item prop="emailCode">
+                <el-input v-model.trim="signUpForm.emailCode" placeholder="验证码" />
+              </el-form-item>
+            </div>
+            <el-button type="primary" class="btn" round @click="sendEmailCode()">
+              发送验证码
+            </el-button>
+          </div>
           <div class="input-field">
-            <i class="fa-solid fa-phone"></i>
-            <el-form-item prop="phone">
-              <el-input v-model.trim="signUpForm.phone" clearable placeholder="手机号" />
+            <i class="fa-solid fa-id-card"></i>
+            <el-form-item prop="userId">
+              <el-input v-model.trim="signUpForm.userId" clearable placeholder="学号" />
             </el-form-item>
           </div>
           <div class="input-field">
@@ -133,7 +151,6 @@
                 type="password"
                 clearable
                 placeholder="密码"
-                autocomplete="off"
                 show-password
               />
             </el-form-item>
@@ -146,7 +163,6 @@
                 type="password"
                 clearable
                 placeholder="确认密码"
-                autocomplete="off"
                 show-password
               />
             </el-form-item>
@@ -183,19 +199,10 @@
       </div>
     </div>
   </div>
-  <Verify
-    mode="pop"
-    :captchaType="captchaType"
-    :imgSize="{ width: '400px', height: '200px' }"
-    ref="verify"
-  ></Verify>
 </template>
 
 <script setup>
-import { ElMessage } from "element-plus";
 import { UserService } from "@/utils/api";
-import { showMessage } from "@/utils/status";
-import Verify from "@/components/verifition/Verify.vue";
 import { ref, getCurrentInstance, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
@@ -207,29 +214,23 @@ const resetLoading = ref(false);
 const loginRef = ref(null);
 const signUpRef = ref(null);
 const resetRef = ref(null);
-const loginForm = ref({
-  email: "",
-  password: "",
-});
-const signUpForm = ref({
-  email: "",
-  phone: "",
-  password: "",
-  confirmPassword: "",
-});
-const resetForm = ref({
-  email: "",
-  emailCode: "",
-  password: "",
-  confirmPassword: "",
-});
-// 处理滑动验证码逻辑
-const verify = ref(null);
-const captchaType = ref("");
-const onShow = (type) => {
-  captchaType.value = type;
-  verify.value.show();
-};
+const recaptchaRef = ref(null);
+const popupRef = ref(null);
+// email: "",
+//   password: "",
+const loginForm = ref({});
+// email: "",
+//   emailCode: "",
+//   studentId: "",
+//   password: "",
+//   confirmPassword: "",
+const signUpForm = ref({});
+// email: "",
+//   emailCode: "",
+//   password: "",
+//   confirmPassword: "",
+const resetForm = ref({});
+
 const loginRules = {
   email: [
     { required: true, message: "请输入邮箱" },
@@ -245,9 +246,10 @@ const signUpRules = {
     { required: true, message: "请输入邮箱" },
     { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
   ],
-  phone: [
-    { required: true, message: "请输入手机号" },
-    { validator: proxy.Verify.phone, message: "手机号不存在", trigger: "blur" },
+  emailCode: [{ required: true, message: "请输入验证码" }],
+  studentId: [
+    { required: true, message: "请输入学号" },
+    { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码" },
@@ -289,38 +291,74 @@ const resetRules = {
     },
   ],
 };
-const Login = async (formData) => {
-  loginRef.value.validate((valid) => {
+const Login = async () => {
+  loginRef.value.validate(async (valid) => {
     if (valid) {
-      // TODO: axios 登录请求
-      //滑动框验证
-      //onShow("blockPuzzle");
-      UserService.login(formData)
-        .then((res) => {
-          if (res.status === 200) {
-            ElMessage.success("登录成功");
-            router.push({ name: "Home" });
-          }
-        })
-        .catch((error) => {});
+      loginLoading.value = true;
+      const validateRecaptcha = await recaptchaRef.value.sendToServer();
+      if (validateRecaptcha) {
+        let params = {};
+        Object.assign(params, loginForm.value);
+        const result = await UserService.login(params);
+        if (result.code == 200) {
+          popupRef.value.show("登录成功");
+          localStorage.setItem("token", result.data);
+          router.push({ name: "Home" });
+        }
+        loginLoading.value = false;
+      }
     }
   });
 };
 
-const SignUp = (formData) => {
-  signUpRef.value.validate((valid) => {
+const SignUp = () => {
+  signUpRef.value.validate(async (valid) => {
     if (valid) {
       signUploading.value = true;
-      // TODO: axios 注册请求
-      ElMessage.success("注册成功");
+      let params = {};
+      Object.assign(params, signUpForm.value);
+      const result = await UserService.register(params);
+      if (result.code == 200) {
+        popupRef.value.show("注册成功");
+      } else {
+        popupRef.value.show(result.msg);
+      }
       signUpRef.value.resetFields();
+      signUploading.value = false;
     }
   });
-  signUploading.value = false;
 };
-const sendEmailCode = () => {};
-const reset = (formData) => {
-  resetRef.value.validate((valid) => {});
+const sendEmailCode = () => {
+  signUpRef.value.validateField("email", async (valid) => {
+    if (valid) {
+      let email = signUpForm.value.email;
+      UserService.sendEmailCode(email).then((res) => {
+        if (res.code == 200) {
+          popupRef.value.show("验证码发送成功");
+        } else {
+          popupRef.value.show(res.msg);
+        }
+      });
+    }
+  });
+};
+const reset = () => {
+  resetRef.value.validate((valid) => {
+    if (valid) {
+      resetLoading.value = true;
+      let params = {};
+      Object.assign(params, resetForm);
+      UserService.resetPassword(params).then((res) => {
+        if (res.code == 200) {
+          popupRef.value.show("重置密码成功");
+          showResetLogin();
+        } else {
+          popupRef.value.show(res.msg);
+        }
+        resetLoading.value = false;
+      });
+    }
+  });
 };
 const containerRef = ref();
 const showResetForm = ref(false);

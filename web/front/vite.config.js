@@ -16,7 +16,7 @@ export default defineConfig({
     cors: true,
     proxy: {
       "/api": {
-        target: "https://mock.presstime.cn/mock/66371c11d4a8a220672371be",
+        target: "http://localhost:3000",
         changeOrigin: true,
         pathRewrite: {
           "^api": "/api",

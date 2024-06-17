@@ -35,6 +35,7 @@ const messages = reactive([
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 10px;
   .config {
     border-radius: 6px;
     background-color: #fff;

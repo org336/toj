@@ -5,6 +5,9 @@ import router from "./router";
 import ElementPlus from "element-plus";
 import VXETable from "vxe-table";
 import { createPinia } from "pinia";
+//引入自定义组件
+import recaptcha from "./components/verifition/recaptcha.vue";
+import popup from "./components/common/popup.vue";
 //引入全局style
 import "./assets/scss/base.scss";
 import "element-plus/dist/index.css";
@@ -20,6 +23,8 @@ app.use(pinia);
 app.use(ElementPlus);
 app.use(VXETable);
 //配置全局组件
+app.component("popup-view", popup);
+app.component("recaptcha-view", recaptcha);
 //配置全局JS
 app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.Verify = Verify;

@@ -10,7 +10,7 @@ const service = axios.create({
 });
 
 //http request 拦截器
-axios.interceptors.request.use(
+service.interceptors.request.use(
   (config) => {
     // 配置请求头
     config.headers = {
@@ -26,22 +26,21 @@ axios.interceptors.request.use(
 );
 
 //http response 拦截器
-axios.interceptors.response.use(
+service.interceptors.response.use(
   (response) => {
-    return response;
+    return response.data;
   },
   (error) => {
-    const { response } = error;
-    if (response) {
-      showMessage(response.status); // 传入响应码，匹配响应码对应信息
-      return Promise.reject(response.data);
+    if (error.response) {
+      return Promise.resolve(error.response.data);
     } else {
-      ElMessage.warning("网络连接异常,请稍后再试!");
+      ElMessage.error("网络错误或请求未发出");
+      return Promise.reject(error);
     }
   }
 );
 
-// 封装 GET POST 请求并导出
+// 封装 GET POST PUT请求并导出
 export function request(url = "", params = {}, type = "GET") {
   return new Promise((resolve, reject) => {
     let promise;

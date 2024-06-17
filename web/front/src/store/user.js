@@ -5,7 +5,6 @@ export const useUserStore = defineStore("user", () => {
   const profile = reactive({
     username: "小红",
     email: "xxxxxxxxxx@qq.com",
-    phone: "18370223323",
     signature: "开发灵感",
     studentId: "1520223609",
     password: "test123456~",

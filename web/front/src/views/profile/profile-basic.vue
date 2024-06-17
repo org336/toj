@@ -15,9 +15,6 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model.trim="profile.email" clearable></el-input>
           </el-form-item>
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model.trim="profile.phone" clearable></el-input>
-          </el-form-item>
           <el-form-item label="学号" prop="studentId">
             <el-input v-model.trim="profile.studentId" clearable></el-input>
           </el-form-item>
@@ -56,10 +53,7 @@ const profileRules = {
     { required: true, message: "请输入邮箱" },
     { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
   ],
-  phone: [
-    { required: true, message: "请输入手机号" },
-    { validator: proxy.Verify.phone, message: "手机号不存在", trigger: "blur" },
-  ],
+
   studentId: [
     { required: true, message: "请输入学号" },
     { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
