@@ -5,6 +5,8 @@ import { ApiException } from '~/constants/exception/api.exception';
 import { HttpStatus } from '@nestjs/common';
 import { BcryptUtils } from '~/utils/encrypt.util';
 import { UserService } from '../user/user.service';
+import { Response } from 'express';
+import { identity } from 'rxjs';
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,10 +14,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validate(credentials: {
-    email: string;
-    password: string;
-  }): Promise<any> {
+  async validate(
+    credentials: {
+      email: string;
+      password: string;
+    },
+    res: Response,
+  ): Promise<any> {
     const user = await this.userService.findOneByEmail(credentials.email);
     if (!user) {
       throw new ApiException(
@@ -35,7 +40,21 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
+
     const payload = { uid: user.uid };
-    return await this.jwtService.signAsync(payload);
+    const jwt = await this.jwtService.signAsync(payload);
+    // 设置HttpOnly Cookie
+    res.cookie('JWT_TOKEN', jwt, {
+      httpOnly: true,
+      secure: false, // 开发环境暂时使用HTTP,在生产环境中确保使用HTTPS
+      sameSite: 'strict',
+      maxAge: 10800000, // 3小时
+    });
+
+    return res.json({
+      code: ApiCode.SUCCESS,
+      msg: 'success',
+      data: { uid: user.uid, identity: user.identity },
+    });
   }
 }

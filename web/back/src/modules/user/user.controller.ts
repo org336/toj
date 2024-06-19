@@ -9,11 +9,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { ProfileDto } from './profile.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 @ApiTags('user')
 @Controller('users')
-export class StudentController {
+export class UserController {
   constructor(private userService: UserService) {}
   // 注册新用户
   @ApiBody({
@@ -42,7 +43,7 @@ export class StudentController {
   }
   // 修改用户密码
   @ApiBody({
-    description: '修改密码的数据',
+    description: '修改密码样例',
     type: 'object',
     schema: {
       properties: {
@@ -56,6 +57,8 @@ export class StudentController {
   async changePassword(
     @Body() data: { email: string; emailCode: string; newPassword: string },
   ) {
+    console.log('data' + data);
+
     return await this.userService.changePassword(data);
   }
   // 发送邮箱验证码
@@ -72,5 +75,61 @@ export class StudentController {
   @Post('email')
   async sendEmailCode(@Body() data: { email: string; purpose: string }) {
     return await this.userService.sendEmailCode(data.email, data.purpose);
+  }
+  @ApiBody({
+    description: '获取用户信息',
+    type: 'object',
+    schema: {
+      properties: {
+        uid: {
+          type: 'string',
+          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
+        },
+      },
+    },
+  })
+  @Post('profile')
+  async getProfile(@Body() data: { uid: string }) {
+    return await this.userService.getProfile(data.uid);
+  }
+  @ApiBody({
+    description: '更新用户信息',
+    type: 'object',
+    schema: {
+      properties: {
+        uid: {
+          type: 'string',
+          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
+        },
+        nickName: { type: 'string', example: '小炎子' },
+        realName: { type: 'string', example: '萧炎' },
+        userId: { type: 'string', example: '1520223609' },
+        email: { type: 'string', example: '2959346375@qq.com' },
+        signature: {
+          type: 'string',
+          example: '三十年河东，三十线河西，莫欺少年穷!!!',
+        },
+        identity: { type: 'number', example: 0 },
+        avatarUrl: {
+          type: 'string',
+          example: '',
+        },
+      },
+    },
+  })
+  @Put('profile')
+  async updateProfile(
+    @Body()
+    data: {
+      uid: string;
+      nickName?: string;
+      realName?: string;
+      userId?: string;
+      email?: string;
+      signature?: string;
+      avatarUrl?: string;
+    },
+  ) {
+    return await this.userService.updateProfile(data);
   }
 }

@@ -14,7 +14,7 @@ export class RecaptchaController {
       },
     },
   })
-  @Post('validate')
+  @Post('recaptcha')
   async validate(@Body('token') token: string): Promise<boolean> {
     const isValid = await this.recaptchaService.validateToken(token);
     return isValid;

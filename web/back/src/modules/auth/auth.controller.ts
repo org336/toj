@@ -1,13 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 @ApiTags('user')
 @Controller('users')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   // 经过jwt管理的登录接口
   @ApiBody({
-    description: '用户登录信息',
+    description: '用户登录接口',
     type: 'object',
     schema: {
       properties: {
@@ -17,9 +18,10 @@ export class AuthController {
     },
   })
   @Post('session')
-  signIn(
+  async login(
     @Body() credentials: { email: string; password: string },
+    @Res() res: Response,
   ): Promise<any> {
-    return this.authService.validate(credentials);
+    return await this.authService.validate(credentials, res);
   }
 }
