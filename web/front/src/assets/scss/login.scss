@@ -232,6 +232,8 @@ i {
   padding: 0.7rem 0;
 }
 .reset-line {
+  display: flex;
+  align-items: center;
   .el-button {
     margin-left: 120px;
   }

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import VueCookies from "vue-cookies";
 const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_BASE_URL),
   routes: [
@@ -90,9 +91,12 @@ const router = createRouter({
     },
   ],
 });
-router.isReady().then(() => {
-  if (router.currentRoute.value.path !== "/") {
-    router.push("/");
+router.beforeEach((to, from, next) => {
+  const loginStatus = VueCookies.get("LOGIN_STATUS") === "1";
+  if (to.name !== "Login" && !loginStatus) {
+    next({ name: "Login" });
+  } else {
+    next();
   }
 });
 export default router;

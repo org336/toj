@@ -6,17 +6,20 @@
     <el-row :gutter="20" class="row-middle">
       <el-col :span="12" class="row-middle-left">
         <el-form label-width="80px" :model="profile" :rules="profileRules">
-          <el-form-item label="昵称" prop="username">
-            <el-input v-model.trim="profile.username" clearable></el-input>
+          <el-form-item label="昵称" prop="nickName">
+            <el-input v-model.trim="profile.nickName" clearable></el-input>
           </el-form-item>
-          <el-form-item label="签名" prop="signature">
-            <el-input v-model.trim="profile.signature" clearable></el-input>
+          <el-form-item label="真实姓名" prop="realName">
+            <el-input v-model.trim="profile.realName" clearable></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model.trim="profile.email" clearable></el-input>
           </el-form-item>
-          <el-form-item label="学号" prop="studentId">
-            <el-input v-model.trim="profile.studentId" clearable></el-input>
+          <el-form-item label="学号" prop="userId">
+            <el-input v-model.trim="profile.userId" clearable></el-input>
+          </el-form-item>
+          <el-form-item label="签名" prop="signature">
+            <el-input v-model.trim="profile.signature" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="updateProfile">更新信息</el-button>
@@ -36,6 +39,7 @@
 
 <script setup>
 import { ref, getCurrentInstance, watchEffect } from "vue";
+import { UserService } from "@/utils/api";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 const { proxy } = getCurrentInstance();
@@ -45,18 +49,20 @@ const onAvatarChange = (file) => {
 };
 const store = useUserStore();
 const { profile } = storeToRefs(store);
-const { updateProfile } = store;
+const updateProfile = async () => {
+  await UserService.updateProfile(profile);
+};
 const profileRules = {
-  username: [{ required: true, message: "请输入昵称" }],
+  nickName: [{ required: true, message: "请输入昵称" }],
+  realName: [{ required: true, message: "请输入真实姓名" }],
+  userId: [
+    { required: true, message: "请输入学号" },
+    { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
+  ],
   signature: [{ required: true, message: "请输入个人签名" }],
   email: [
     { required: true, message: "请输入邮箱" },
     { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
-  ],
-
-  studentId: [
-    { required: true, message: "请输入学号" },
-    { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
   ],
 };
 </script>

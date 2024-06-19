@@ -25,7 +25,7 @@
                 <el-input v-model.trim="resetForm.emailCode" placeholder="验证码" />
               </el-form-item>
             </div>
-            <el-button type="primary" class="btn" round @click="sendEmailCode(resetForm.email)">
+            <el-button type="primary" class="btn" round @click="sendEmailCode('resetPwd')">
               发送验证码
             </el-button>
           </div>
@@ -43,9 +43,9 @@
           </div>
           <div class="input-field">
             <i class="fa-solid fa-lock"></i>
-            <el-form-item prop="confirmPassword">
+            <el-form-item prop="newPassword">
               <el-input
-                v-model.trim="resetForm.confirmPassword"
+                v-model.trim="resetForm.newPassword"
                 type="password"
                 placeholder="确认新密码"
                 show-password
@@ -133,7 +133,7 @@
                 <el-input v-model.trim="signUpForm.emailCode" placeholder="验证码" />
               </el-form-item>
             </div>
-            <el-button type="primary" class="btn" round @click="sendEmailCode()">
+            <el-button type="primary" class="btn" round @click="sendEmailCode('register')">
               发送验证码
             </el-button>
           </div>
@@ -203,8 +203,9 @@
 
 <script setup>
 import { UserService } from "@/utils/api";
-import { ref, getCurrentInstance, nextTick } from "vue";
+import { ref, getCurrentInstance } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { LocalStorage } from "@/utils/storage";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
@@ -228,7 +229,7 @@ const signUpForm = ref({});
 // email: "",
 //   emailCode: "",
 //   password: "",
-//   confirmPassword: "",
+//   newPassword: "",
 const resetForm = ref({});
 
 const loginRules = {
@@ -247,7 +248,7 @@ const signUpRules = {
     { validator: proxy.Verify.email, message: "邮箱不存在", trigger: "blur" },
   ],
   emailCode: [{ required: true, message: "请输入验证码" }],
-  studentId: [
+  userId: [
     { required: true, message: "请输入学号" },
     { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
   ],
@@ -282,11 +283,11 @@ const resetRules = {
       trigger: "blur",
     },
   ],
-  confirmPassword: [
-    { required: true, message: "请再次输入密码" },
+  newPassword: [
+    { required: true, message: "请输入新密码" },
     {
       validator: (rule, value, callback) =>
-        proxy.Verify.confirmPassword(rule, value, callback, resetForm.value.password),
+        proxy.Verify.resetPassword(rule, value, callback, resetForm.value.password),
       trigger: "blur",
     },
   ],
@@ -294,16 +295,24 @@ const resetRules = {
 const Login = async () => {
   loginRef.value.validate(async (valid) => {
     if (valid) {
-      loginLoading.value = true;
       const validateRecaptcha = await recaptchaRef.value.sendToServer();
       if (validateRecaptcha) {
+        loginLoading.value = true;
         let params = {};
         Object.assign(params, loginForm.value);
         const result = await UserService.login(params);
         if (result.code == 200) {
-          popupRef.value.show("登录成功");
-          localStorage.setItem("token", result.data);
+          popupRef.value.show("登录成功!");
+          LocalStorage.set("user_uid", result.data.uid);
+          LocalStorage.set("user_identity", result.data.identity);
+          proxy.VueCookies.set("LOGIN_STATUS", 1);
           router.push({ name: "Home" });
+        } else if (result.code == 404) {
+          popupRef.value.show("请先注册邮箱!");
+        } else if (result.code == 402) {
+          popupRef.value.show("密码错误!");
+        } else {
+          popupRef.value.show(result.msg);
         }
         loginLoading.value = false;
       }
@@ -320,19 +329,31 @@ const SignUp = () => {
       const result = await UserService.register(params);
       if (result.code == 200) {
         popupRef.value.show("注册成功");
+        showSignIn();
       } else {
         popupRef.value.show(result.msg);
       }
-      signUpRef.value.resetFields();
       signUploading.value = false;
     }
   });
 };
-const sendEmailCode = () => {
-  signUpRef.value.validateField("email", async (valid) => {
+const sendEmailCode = (purpose) => {
+  let validateRef = ref(null);
+  let email = null;
+  if (purpose === "register") {
+    validateRef = signUpRef;
+    email = signUpForm.value.email;
+  } else {
+    validateRef = resetRef;
+    email = resetForm.value.email;
+  }
+  validateRef.value.validateField("email", async (valid) => {
     if (valid) {
-      let email = signUpForm.value.email;
-      UserService.sendEmailCode(email).then((res) => {
+      let params = {
+        email: email,
+        purpose: purpose,
+      };
+      UserService.sendEmailCode(params).then((res) => {
         if (res.code == 200) {
           popupRef.value.show("验证码发送成功");
         } else {
@@ -347,8 +368,8 @@ const reset = () => {
     if (valid) {
       resetLoading.value = true;
       let params = {};
-      Object.assign(params, resetForm);
-      UserService.resetPassword(params).then((res) => {
+      Object.assign(params, resetForm.value);
+      UserService.resetPwd(params).then((res) => {
         if (res.code == 200) {
           popupRef.value.show("重置密码成功");
           showResetLogin();

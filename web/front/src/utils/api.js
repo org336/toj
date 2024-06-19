@@ -13,17 +13,17 @@ export class UserService {
   static async resetPwd(params) {
     return request("/users/password", params, "PUT");
   }
-  static async validate(params) {
-    return request("/users/validate", params, "POST");
+  static async validateRecaptcha(params) {
+    return request("/users/recaptcha", params, "POST");
   }
   static async updateProfile(params) {
     return request("/users/profile", params, "PUT");
   }
   static async getProfile(params) {
-    return request("/users/profile", params, "GET");
+    return request("/users/profile", params, "POST");
   }
-  static async sendEmailCode(param) {
-    return request("/users/email", param, "POST");
+  static async sendEmailCode(params) {
+    return request("/users/email", params, "POST");
   }
 }
 

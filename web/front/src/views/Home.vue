@@ -23,7 +23,7 @@
 
         <!-- 用户头像 -->
         <div class="avatar" @click="shiftProfile">
-          <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
+          <el-avatar :src="profile.avatarUrl" shape="square">{{ profile.nickName }}</el-avatar>
         </div>
         <div class="right-arrow" @click="toggleRightSidebar">
           <i class="fas fa-chevron-left"></i>
@@ -72,7 +72,7 @@
             <div class="user-avatar" @click="">
               <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
             </div>
-            <div class="user-name">{{ profile.username }}</div>
+            <div class="user-name">{{ profile.nickName }}</div>
           </div>
           <div class="leave" @click="toggleRightSidebar">
             <i class="fas fa-times"></i>
@@ -100,7 +100,7 @@
               <i class="fas fa-pencil-alt"></i> 作业列表
             </el-menu-item>
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
-            <el-menu-item index="/login">
+            <el-menu-item index="/login" @click="logout">
               <i class="fas fa-sign-out-alt"></i> 退出登录
             </el-menu-item>
           </el-menu>
@@ -164,6 +164,7 @@ const backToHome = () => {
 };
 //处理右边栏的数据
 const store = useUserStore();
+useUserStore().getProfile();
 const { profile } = storeToRefs(store);
 //点击切换用户消息
 const shiftMessage = () => {
@@ -172,6 +173,8 @@ const shiftMessage = () => {
 const shiftProfile = () => {
   router.push("/profile");
 };
+// 事件
+const logout = () => {};
 //主动加载home-page组件
 onMounted(() => {
   router.push("/");

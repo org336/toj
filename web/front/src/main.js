@@ -22,6 +22,7 @@ app.use(router);
 app.use(pinia);
 app.use(ElementPlus);
 app.use(VXETable);
+app.use(VueCookies);
 //配置全局组件
 app.component("popup-view", popup);
 app.component("recaptcha-view", recaptcha);
