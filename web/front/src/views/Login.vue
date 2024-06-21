@@ -95,7 +95,7 @@
               />
             </el-form-item>
           </div>
-          <recaptcha-view ref="recaptchaRef"></recaptcha-view>
+          <recaptcha-view ref="recaptchaRef" @message="handlePopupMessage"></recaptcha-view>
           <div class="reset-line">
             <el-button
               type="primary"
@@ -292,6 +292,9 @@ const resetRules = {
     },
   ],
 };
+const handlePopupMessage = (message) => {
+  popupRef.value.show("warning", message);
+};
 const Login = async () => {
   loginRef.value.validate(async (valid) => {
     if (valid) {
@@ -305,7 +308,7 @@ const Login = async () => {
           popupRef.value.show("登录成功!");
           LocalStorage.set("user_uid", result.data.uid);
           LocalStorage.set("user_identity", result.data.identity);
-          proxy.VueCookies.set("LOGIN_STATUS", 1);
+          proxy.VueCookies.set("LOGIN_STATUS", 1, "3d");
           router.push({ name: "Home" });
         } else if (result.code == 404) {
           popupRef.value.show("请先注册邮箱!");

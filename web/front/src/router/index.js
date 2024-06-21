@@ -87,7 +87,8 @@ const router = createRouter({
     },
     {
       path: "/:pathMatch(.*)*",
-      redirect: "/",
+      name: "NotFound",
+      component: () => import("@/components/common/NotFound.vue"),
     },
   ],
 });

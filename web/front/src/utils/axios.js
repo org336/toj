@@ -1,12 +1,11 @@
 import axios from "axios";
-import { showMessage } from "./status"; // 引入状态码文件
 import { ElMessage } from "element-plus"; // 引入el 提示框
 
 // 创建axios实例
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_POST,
   timeout: 5000, // 请求超时时间
-  withCredentials: true,
+  withCredentials: true, //携带HttpOnly cookie
 });
 
 //http request 拦截器

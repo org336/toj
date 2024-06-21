@@ -1,4 +1,5 @@
 <template>
+  <popup-view ref="popupRef"></popup-view>
   <div class="home">
     <div class="nav" :class="extraClass">
       <div class="nav-start">
@@ -81,7 +82,7 @@
 
         <div class="sidebar-bottom">
           <el-menu class="el-menu" :router="true">
-            <el-menu-item index="signaturePage">{{ profile.signature }}</el-menu-item>
+            <el-menu-item @click.native.prevent>{{ profile.signature }}</el-menu-item>
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
             <el-menu-item index="/profile">
               <i class="fa-regular fa-user"></i> 个人信息
@@ -114,13 +115,14 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch, watchEffect, computed, onMounted } from "vue";
+import { ref, getCurrentInstance, watch, computed, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
+const popupRef = ref(null);
 //处理导航栏的样式变化
 const isExtra = ref(false);
 const checkScroll = () => {
@@ -174,7 +176,12 @@ const shiftProfile = () => {
   router.push("/profile");
 };
 // 事件
-const logout = () => {};
+const logout = () => {
+  //删除浏览器的本地存储和cookie
+  proxy.VueCookies.remove("LOGIN_STATUS");
+  LocalStorage.remove("user_uid");
+  LocalStorage.remove("user_identity");
+};
 //主动加载home-page组件
 onMounted(() => {
   router.push("/");
