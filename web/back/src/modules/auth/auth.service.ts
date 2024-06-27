@@ -6,7 +6,6 @@ import { HttpStatus } from '@nestjs/common';
 import { BcryptUtils } from '~/utils/encrypt.util';
 import { UserService } from '../user/user.service';
 import { Response } from 'express';
-import { identity } from 'rxjs';
 @Injectable()
 export class AuthService {
   constructor(
@@ -41,14 +40,16 @@ export class AuthService {
       );
     }
 
-    const payload = { uid: user.uid };
+    const payload = {
+      uid: user.uid,
+    };
     const jwt = await this.jwtService.signAsync(payload);
     // 设置HttpOnly Cookie
-    res.cookie('JWT_TOKEN', jwt, {
+    res.cookie('JWTOKEN', jwt, {
       httpOnly: true,
       secure: false, // 开发环境暂时使用HTTP,在生产环境中确保使用HTTPS
       sameSite: 'strict',
-      maxAge: 10800000, // 3小时
+      maxAge: 259200000, // 3天有效时间：3 * 24 * 60 * 60 * 1000
     });
 
     return res.json({

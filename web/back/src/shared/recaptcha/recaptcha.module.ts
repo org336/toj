@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { RecaptchaController } from './recaptcha.controller';
 import { RecaptchaService } from './recaptcha.service';
-import { ConfigModule } from '@nestjs/config';
+import { AxiosModule } from '../axios/axios.module';
 
 @Module({
-  imports: [ConfigModule],
-  controllers: [RecaptchaController],
+  imports: [AxiosModule],
   providers: [RecaptchaService],
+  exports: [RecaptchaService],
 })
 export class RecaptchaModule {}

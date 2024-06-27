@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Transaction } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BcryptUtils } from '~/utils/encrypt.util';
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
@@ -60,7 +60,7 @@ export class UserService {
     }
     let emailKey = `emailCode:register:${user.email}`;
     await this.emailService.verifyEmailCode(emailKey, user.emailCode);
-    const uid = uuidv1();
+    const uid = uuid();
     user.password = await BcryptUtils.hashPassword(user.password);
     const newuser = this.userRepository.create({ ...user, uid });
     await this.userRepository.save(newuser);
@@ -89,12 +89,12 @@ export class UserService {
   }
   async updateProfile(data: {
     uid: string;
-    nickName?: string;
-    realName?: string;
-    userId?: string;
-    email?: string;
-    signature?: string;
-    avatarUrl?: string;
+    nickName: string;
+    realName: string;
+    userId: string;
+    email: string;
+    signature: string;
+    avatarUrl: string;
   }) {
     const user = await this.findOneByUid(data.uid);
     // 更新用户资料

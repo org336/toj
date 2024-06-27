@@ -2,6 +2,7 @@ import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { Public } from '~/common/decorators/common.decorator';
 @ApiTags('user')
 @Controller('users')
 export class AuthController {
@@ -17,6 +18,7 @@ export class AuthController {
       },
     },
   })
+  @Public()
   @Post('session')
   async login(
     @Body() credentials: { email: string; password: string },

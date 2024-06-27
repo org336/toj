@@ -11,11 +11,16 @@ import {
 import { UserService } from './user.service';
 import { ProfileDto } from './profile.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Public } from '~/common/decorators/common.decorator';
+import { RecaptchaService } from '~/shared/recaptcha/recaptcha.service';
 @ApiTags('user')
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly recaptchaService: RecaptchaService,
+  ) {}
+
   // 注册新用户
   @ApiBody({
     description: '用户注册提交的信息',
@@ -29,6 +34,7 @@ export class UserController {
       },
     },
   })
+  @Public()
   @Post('member')
   async register(
     @Body()
@@ -53,12 +59,11 @@ export class UserController {
       },
     },
   })
+  @Public()
   @Put('password')
   async changePassword(
     @Body() data: { email: string; emailCode: string; newPassword: string },
   ) {
-    console.log('data' + data);
-
     return await this.userService.changePassword(data);
   }
   // 发送邮箱验证码
@@ -72,6 +77,7 @@ export class UserController {
       },
     },
   })
+  @Public()
   @Post('email')
   async sendEmailCode(@Body() data: { email: string; purpose: string }) {
     return await this.userService.sendEmailCode(data.email, data.purpose);
@@ -88,6 +94,20 @@ export class UserController {
       },
     },
   })
+  @ApiBody({
+    description: '用户人机校验',
+    type: 'object',
+    schema: {
+      properties: {
+        token: { type: 'string', example: '' },
+      },
+    },
+  })
+  @Public()
+  @Post('recaptcha')
+  async validate(@Body('token') token: string): Promise<boolean> {
+    return await this.recaptchaService.validateToken(token);
+  }
   @Post('profile')
   async getProfile(@Body() data: { uid: string }) {
     return await this.userService.getProfile(data.uid);
@@ -122,12 +142,12 @@ export class UserController {
     @Body()
     data: {
       uid: string;
-      nickName?: string;
-      realName?: string;
-      userId?: string;
-      email?: string;
-      signature?: string;
-      avatarUrl?: string;
+      nickName: string;
+      realName: string;
+      userId: string;
+      email: string;
+      signature: string;
+      avatarUrl: string;
     },
   ) {
     return await this.userService.updateProfile(data);

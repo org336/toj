@@ -20,7 +20,6 @@ export class EmailService {
   async verifyEmailCode(emailKey: string, emailCode: string): Promise<void> {
     let currentDataRaw = await this.redisService.get(emailKey);
     const currentData = currentDataRaw ? JSON.parse(currentDataRaw) : {};
-    console.log('currentData' + currentData);
 
     if (Object.keys(currentData).length === 0) {
       throw new ApiException(
