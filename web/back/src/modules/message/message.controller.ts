@@ -34,11 +34,11 @@ export class MessageController {
       properties: {
         event: {
           type: 'string',
-          example: 'talk',
+          example: 'notice',
         },
         type: {
           type: 'number',
-          example: 1,
+          example: 0,
         },
         title: {
           type: 'string',
@@ -46,7 +46,7 @@ export class MessageController {
         },
         content: {
           type: 'string',
-          example: '你好，这是一条私人消息。',
+          example: '你好，这是一条系统消息。',
         },
       },
     },
