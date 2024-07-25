@@ -14,9 +14,9 @@ const router = createRouter({
       component: () => import("@/views/Home.vue"),
       children: [
         {
-          path: "",
-          name: "HomePage",
-          component: () => import("@/views/main/home-page.vue"),
+          path: "/",
+          name: "Dashboard",
+          component: () => import("@/views/dashboard/dashboard-index.vue"),
         },
         {
           path: "/profile",
@@ -47,9 +47,9 @@ const router = createRouter({
           component: () => import("@/views/message/user-message.vue"),
           children: [
             {
-              path: "personal",
-              name: "MessagePersonal",
-              component: () => import("@/views/message/message-personal.vue"),
+              path: "private",
+              name: "MessagePrivate",
+              component: () => import("@/views/message/message-private.vue"),
             },
             {
               path: "teacher",
@@ -74,6 +74,11 @@ const router = createRouter({
           ],
         },
         {
+          path: "/homework",
+          name: "HomeworkPage",
+          component: () => import("@/views/homework/user-homework.vue"),
+        },
+        {
           path: "/course",
           name: "CoursePage",
           component: () => import("@/views/course/course-page.vue"),
@@ -82,6 +87,11 @@ const router = createRouter({
           path: "/class",
           name: "ClassPage",
           component: () => import("@/views/class/class-page.vue"),
+        },
+        {
+          path: "/task",
+          name: "TaskPage",
+          component: () => import("@/views/task/task-page.vue"),
         },
       ],
     },

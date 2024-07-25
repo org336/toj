@@ -4,7 +4,7 @@
       <div class="item">
         <div class="top-box">
           <span class="title">{{ item.title }}</span>
-          <span class="time">{{ item.time }}</span>
+          <span class="time">{{ item.update_time }}</span>
         </div>
         <div class="bottom-box">
           <span class="content">{{ item.content }}</span>
@@ -16,19 +16,20 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { UserService } from "@/utils/api";
+import { MessageService } from "@/utils/api";
 const messages = ref([]);
-const params = {};
-const getMessages = async () => {
-  UserService.getMessages(params, "system")
+const getMessages = () => {
+  let params = {
+    uid: localStorage.getItem("user_uid"),
+  };
+  MessageService.getSystemMessage(params)
     .then((res) => {
-      if (res.status === 200) {
-        messages.value = res.data.data;
+      if (res.code == 200) {
+        messages.value = res.data;
       }
     })
     .catch((error) => {});
 };
-
 onMounted(() => {
   getMessages();
 });

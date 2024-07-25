@@ -145,26 +145,6 @@ i {
   border-color: #4481eb;
 }
 
-.btn {
-  font-size: 1.1rem;
-  width: 150px;
-  background-color: #5995fd;
-  border: none;
-  outline: none;
-  height: 49px;
-  border-radius: 49px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin: 10px 0;
-  cursor: pointer;
-  transition: 0.5s;
-}
-
-.btn:hover {
-  background-color: #4d84e2;
-}
-
 .panels-container {
   position: absolute;
   height: 100%;
@@ -242,13 +222,18 @@ i {
   }
 }
 .btn.transparent {
+  border: none;
+  outline: none;
+  color: #fff;
   margin: 0;
   background: none;
   border: 2px solid #fff;
+  border-radius: 42px;
   width: 130px;
   height: 42px;
   font-weight: 600;
   font-size: 1rem;
+  cursor: pointer;
 }
 
 .btn.transparent:hover {

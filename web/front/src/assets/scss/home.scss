@@ -194,17 +194,24 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       .user {
         flex: 1 1 auto;
         display: flex;
-        align-items: baseline;
+        align-items: center;
+        justify-content: flex-start;
         gap: 8px;
         .user-name {
           font-size: 1.2rem;
           overflow-wrap: break-word;
           max-width: 180px;
         }
+      }
+    }
+    .sidebar-bottom {
+      .signature {
+        max-width: 250px;
+        overflow-wrap: break-word;
       }
     }
     :deep(.el-overlay) {

@@ -9,7 +9,7 @@ export class StorageUtil {
    * @param {Object} value 值
    */
   set(key, value) {
-    this.storage.setItem(key, JSON.stringify(value));
+    this.storage.setItem(key, value);
   }
 
   /**
@@ -18,7 +18,7 @@ export class StorageUtil {
    * @return {Object}
    */
   get(key) {
-    return JSON.parse(this.storage.getItem(key)) || null;
+    return this.storage.getItem(key) || null;
   }
 
   /**
@@ -37,5 +37,5 @@ export class StorageUtil {
   }
 }
 
-export const LocalStorage = new StorageUtil(window.localStorage);
-export const SessionStorage = new StorageUtil(window.sessionStorage);
+export const myLocalStorage = new StorageUtil(window.localStorage);
+export const mySessionStorage = new StorageUtil(window.sessionStorage);

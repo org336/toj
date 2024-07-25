@@ -1,10 +1,11 @@
 {
   "name": "toj-web-front",
-  "version": "v1.1.8.20240408165408",
+  "version": "v1.2.8.20240408165408",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --mode development",
+    "prod": "vite  --mode production",
     "build": "vite build",
     "preview": "vite preview",
     "postbuild": "node scripts/prj-version.js build",
@@ -36,6 +37,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/runtime-dom": "^3.4.33",
+    "typescript": "^5.5.4",
     "vite": "^5.1.6"
   }
 }

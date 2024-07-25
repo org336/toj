@@ -23,18 +23,9 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { UserService } from "@/utils/api";
+import { MessageService } from "@/utils/api";
 const messages = ref([]);
-const params = {};
-const getMessages = async () => {
-  UserService.getMessages(params, "teacher")
-    .then((res) => {
-      if (res.status === 200) {
-        messages.value = res.data.data;
-      }
-    })
-    .catch((error) => {});
-};
+const getMessages = async () => {};
 
 onMounted(() => {
   getMessages();

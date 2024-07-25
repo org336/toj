@@ -1,13 +1,17 @@
 <template>
-  <div class="home-top" :style="{ backgroundImage: `url(${currentImage.url})` }">
+  <div class="dashboard-top" :style="{ backgroundImage: `url(${currentImage.url})` }">
     <div class="content">
       <p class="title">{{ currentImage.title }}</p>
       <p class="desc author">By {{ currentImage.desc.author }}</p>
       <p class="desc time">{{ currentImage.desc.time }}</p>
     </div>
   </div>
-  <div class="home-middle"></div>
-  <div class="home-bottom"></div>
+  <div class="dashboard-middle">
+    <section class="gallery">
+      <div></div>
+    </section>
+  </div>
+  <div class="dashboard-bottom"></div>
 </template>
 
 <script setup>
@@ -54,7 +58,7 @@ const currentImage = ref(images[Math.floor(Math.random() * images.length)]);
 </script>
 
 <style lang="scss" scoped>
-.home-top {
+.dashboard-top {
   position: relative;
   top: 0;
   z-index: 5;
@@ -85,7 +89,10 @@ const currentImage = ref(images[Math.floor(Math.random() * images.length)]);
     }
   }
 }
-.home-middle {
-  height: 100vh;
+.dashboard-middle {
+  .gallery {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
 </style>

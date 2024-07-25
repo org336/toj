@@ -7,7 +7,8 @@ import VXETable from "vxe-table";
 import { createPinia } from "pinia";
 //引入自定义组件
 import recaptcha from "./components/verifition/recaptcha.vue";
-import popup from "./components/common/popup.vue";
+import CustomButton from "./components/common/CustomButton.vue";
+import CustomTip from "./components/common/CustomTip.vue";
 //引入全局style
 import "./assets/scss/base.scss";
 import "element-plus/dist/index.css";
@@ -24,7 +25,8 @@ app.use(ElementPlus);
 app.use(VXETable);
 app.use(VueCookies);
 //配置全局组件
-app.component("popup-view", popup);
+app.component("CustomTip", CustomTip);
+app.component("CustomButton", CustomButton);
 app.component("recaptcha-view", recaptcha);
 //配置全局JS
 app.config.globalProperties.VueCookies = VueCookies;

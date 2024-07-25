@@ -1,7 +1,8 @@
 const regs = {
   email: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/,
   password: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&~_])[A-Za-z\d@$!%*?&~_]{8,18}$/,
-  studentId: /^\d{10}$/,
+  phone: /^1\d{10}$/,
+  userId: /^\d{10}$/,
 };
 const verify = (rule, value, reg, callback) => {
   if (value) {
@@ -43,8 +44,8 @@ export default {
   phone: (rule, value, callback) => {
     return verify(rule, value, regs.phone, callback);
   },
-  studentId: (rule, value, callback) => {
-    return verify(rule, value, regs.studentId, callback);
+  userId: (rule, value, callback) => {
+    return verify(rule, value, regs.userId, callback);
   },
   password: (rule, value, callback) => {
     return verify(rule, value, regs.password, callback);

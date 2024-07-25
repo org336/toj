@@ -5,8 +5,8 @@
         <div class="title">
           <div class="title-name">消息中心</div>
         </div>
-        <el-menu @select="handleSelect" default-active="personal">
-          <el-menu-item index="personal">{{ messgaeTypes.personal }}</el-menu-item>
+        <el-menu @select="handleSelect" default-active="private">
+          <el-menu-item index="private">{{ messgaeTypes.private }}</el-menu-item>
           <el-menu-item index="teacher">{{ messgaeTypes.teacher }}</el-menu-item>
           <el-menu-item index="system">{{ messgaeTypes.system }}</el-menu-item>
           <el-menu-item index="my">{{ messgaeTypes.my }}</el-menu-item>
@@ -33,13 +33,13 @@ import { storeToRefs } from "pinia";
 const store = useUserStore();
 const { profile } = storeToRefs(store);
 const messgaeTypes = {
-  personal: "私人消息",
+  private: "私人消息",
   teacher: "老师消息",
   system: "系统通知",
   my: "我的消息",
   setting: "消息设置",
 };
-const selectedMenu = ref("personal");
+const selectedMenu = ref("private");
 const handleSelect = (index) => {
   selectedMenu.value = index;
   router.push({ path: `/message/${selectedMenu.value}` });

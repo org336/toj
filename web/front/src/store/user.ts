@@ -1,16 +1,20 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { computed, reactive, ref, toRaw } from "vue";
 import { UserService } from "@/utils/api";
+import { ElMessage } from "element-plus";
+import { myLocalStorage } from "@/utils/storage";
+import { pa } from "element-plus/es/locale";
 interface UserProfile {
   email: string;
   nickName: string;
   realName: string;
   userId: string;
   signature: string;
-  identity: number;
   avatarUrl: string;
+  identity: number;
 }
 export const useUserStore = defineStore("user", () => {
+  const VITE_STATIC_PATH = import.meta.env.VITE_STATIC_PATH;
   const profile = reactive<UserProfile>({
     nickName: "",
     realName: "",
@@ -18,30 +22,47 @@ export const useUserStore = defineStore("user", () => {
     email: "",
     signature: "",
     avatarUrl: "",
-    identity: null,
+    identity: 0,
   });
-
-  const updateProfile = async (newProfile) => {
-    const userUid = localStorage.getItem("user_uid");
-    const data = {
-      userUid,
-      newProfile,
-    };
-    const updatedProfile = await UserService.updateProfile(data);
-    Object.assign(profile, updatedProfile);
+  const avatarUrl = computed(() => `${VITE_STATIC_PATH}${profile.avatarUrl}`);
+  const updateProfile = async () => {
+    let params = { uid: myLocalStorage.get("user_uid"), ...toRaw(profile) };
+    const result = await UserService.updateProfile(params);
+    if (result.code == 200) {
+      ElMessage({
+        message: "更新信息成功",
+        type: "success",
+        center: true,
+      });
+      Object.assign(profile, result.data);
+    } else {
+      ElMessage({
+        message: "更新信息失败",
+        type: "error",
+        center: true,
+      });
+    }
   };
+
   const getProfile = async () => {
-    const userUid: string = localStorage.getItem("user_uid");
-    let result = await UserService.getProfile({ userUid });
+    const uid: string = myLocalStorage.get("user_uid");
+    let result = await UserService.getProfile({ uid: uid });
     if (result.code == 200) {
       Object.assign(profile, result.data);
     } else {
-      return;
+      ElMessage({
+        message: "获取用户信息失败",
+        type: "error",
+        center: true,
+      });
     }
   };
+  const updateIdentity = async () => {};
   return {
     profile,
+    avatarUrl,
     updateProfile,
     getProfile,
+    updateIdentity,
   };
 });

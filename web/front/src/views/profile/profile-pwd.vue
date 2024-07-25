@@ -3,16 +3,15 @@
     <el-row class="row-top">
       <el-col :span="12">修改密码</el-col>
     </el-row>
-    <el-form label-width="80px" :model="pwdForm" :rules="pwdRules">
+    <el-form ref="pwdRef" label-width="80px" :model="pwdForm" :rules="pwdRules" @submit.prevent>
       <div class="row">
         <el-row :span="6"> <div class="row-title">旧密码</div></el-row>
         <el-row :span="12">
-          <el-form-item prop="password">
+          <el-form-item prop="oldPassword">
             <el-input
               type="password"
               v-model.trim="pwdForm.oldPassword"
               clearable
-              autocomplete="off"
               show-password
             >
             </el-input>
@@ -22,12 +21,11 @@
       <div class="row">
         <el-row :span="6"> <div class="row-title">新密码</div></el-row>
         <el-row :span="12">
-          <el-form-item prop="password">
+          <el-form-item prop="newPassword">
             <el-input
               type="password"
               v-model.trim="pwdForm.newPassword"
               clearable
-              autocomplete="off"
               show-password
             >
             </el-input>
@@ -42,30 +40,52 @@
               type="password"
               v-model.trim="pwdForm.confirmPassword"
               clearable
-              autocomplete="off"
               show-password
             >
             </el-input>
           </el-form-item>
-        </el-row></div
-    ></el-form>
+        </el-row>
+        <el-row
+          ><span class="row-prompt"> 确保密码是数字、字母、特殊字符的8-18位组合 </span></el-row
+        >
+      </div></el-form
+    >
 
     <div class="row button">
-      <el-button type="primary">更新密码</el-button>
+      <CustomButton
+        :width="120"
+        :height="45"
+        :isLoading="loadingList.passwordLoading"
+        buttonText="更新密码"
+        loadingText="更新中"
+        @click="updatePassword"
+      ></CustomButton>
+      <button type="reset" class="btn transparent link" @click="showReset">忘记密码？</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from "vue";
+import { ElMessage } from "element-plus";
+import { UserService } from "@/utils/api";
+import { myLocalStorage } from "@/utils/storage";
+import { ref, reactive, getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
-const pwdForm = ref({
-  oldPassword: "",
-  newPassword: "",
-  confirmPassword: "",
+const pwdForm = ref({});
+const pwdRef = ref();
+const loadingList = reactive({
+  passwordLoading: false,
 });
 const pwdRules = {
-  password: [
+  oldPassword: [
+    { required: true, message: "请输入密码" },
+    {
+      validator: proxy.Verify.password,
+      message: "密码只能是数字、字母、特殊字符的8-18位组合",
+      trigger: "blur",
+    },
+  ],
+  newPassword: [
     { required: true, message: "请输入密码" },
     {
       validator: proxy.Verify.password,
@@ -82,6 +102,38 @@ const pwdRules = {
     },
   ],
 };
+const updatePassword = () => {
+  pwdRef.value.validate((valid) => {
+    if (valid) {
+      loadingList.passwordLoading = true;
+      let params = {};
+      params["uid"] = myLocalStorage.get("user_uid");
+      Object.assign(params, pwdForm.value);
+      UserService.updatePwd(params)
+        .then((res) => {
+          if (res.code == 200) {
+            pwdForm.value = {};
+            ElMessage({
+              showClose: true,
+              message: "更新密码成功",
+              type: "success",
+              center: true,
+            });
+          } else {
+            ElMessage({
+              showClose: true,
+              message: res.msg,
+              type: "error",
+              center: true,
+            });
+          }
+        })
+        .finally(() => {
+          loadingList.passwordLoading = false;
+        });
+    }
+  });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -97,9 +149,8 @@ const pwdRules = {
   }
 
   .row {
-    margin-top: 12px;
     .row-title {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       margin-bottom: 8px;
     }
     .el-form-item {
@@ -111,18 +162,21 @@ const pwdRules = {
         }
       }
     }
-  }
-  .button {
-    margin-top: 24px;
-    span {
-      color: #5995fd;
-      margin-left: 12px;
+    .row-prompt {
+      color: #999;
       font-size: 0.9rem;
-      cursor: pointer;
-      &:hover {
-        text-decoration: underline;
-      }
     }
+  }
+  .btn.transparent {
+    border: none;
+    outline: none;
+    color: #4d84e2;
+    background: none;
+    width: 100px;
+    height: 40px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
   }
 }
 </style>

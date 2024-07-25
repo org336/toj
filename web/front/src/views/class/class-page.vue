@@ -1,14 +1,15 @@
 <template>
   <div class="class-page">
     <div class="left-part">
-      <div class="class-manage">
-        <div class="item new" @click="addClass">新建班级</div>
-        <div class="item manage">管理班级</div>
+      <div class="buttons">
+        <el-button type="primary" plain size="large" @click="showEdit1">新建班级</el-button>
+        <el-button type="primary" plain size="large" @click="showEdit2">班级设置</el-button>
       </div>
       <div class="search">
         <el-input clearable placeholder="搜索班级" v-model.trim="searchClass" size="default">
           <template #prefix><i class="fas fa-search"></i></template>
         </el-input>
+        <el-button type="primary" plain>搜索</el-button>
       </div>
       <div class="class-list">
         <el-menu class="el-menu" :default-active="selectedClass" @select="handleSelect">
@@ -96,18 +97,19 @@
 
         <vxe-column title="操作" width="200">
           <template #default="{ row }">
-            <template v-if="hasUpdateStatus(row)">
-              <vxe-button @click="saveUpdateEvent(row)" :loading="row.loading"
-                >局部保存</vxe-button
-              >
-            </template>
+            <vxe-button mode="text" icon="vxe-icon-edit" @click="editEvent(row)"></vxe-button>
+            <vxe-button
+              mode="text"
+              icon="vxe-icon-delete"
+              @click="removeEvent(row)"
+            ></vxe-button>
           </template>
         </vxe-column>
       </vxe-table>
     </div>
   </div>
   <vxe-modal
-    v-model="showEdit"
+    v-model="showAddClass"
     :title="type ? '编辑&保存' : '新增&保存'"
     width="800"
     min-width="600"
@@ -175,8 +177,80 @@
         </vxe-form-item>
         <vxe-form-item align="center" title-align="left" :span="24">
           <template #default>
-            <vxe-button type="submit">提交</vxe-button>
-            <vxe-button type="reset">重置</vxe-button>
+            <vxe-button type="submit" @click="addClass">提交</vxe-button>
+            <vxe-button type="reset" @clicl="resetClass">重置</vxe-button>
+          </template>
+        </vxe-form-item>
+      </vxe-form>
+    </template>
+  </vxe-modal>
+  <vxe-modal
+    v-model="showClassSetting"
+    title="班级设置"
+    width="500"
+    min-width="500"
+    min-height="400"
+    :loading="submitLoading"
+    resize
+    destroy-on-close
+  >
+    <template #default>
+      <vxe-form
+        :data="classSetting"
+        title-align="right"
+        title-width="100"
+        @submit="submitEvent"
+      >
+        <vxe-form-item
+          title="通用设置"
+          title-align="left"
+          :title-width="200"
+          :span="24"
+        ></vxe-form-item>
+        <vxe-form-item field="number" title="允许学生加入" :span="24" :item-render="{}">
+          <template #default="{ data }">
+            <div class="radio-list">
+              <el-switch
+                v-model="classSetting.option1"
+                active-text="开启"
+                inactive-text="关闭"
+              ></el-switch>
+            </div>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item field="number" title="允许学生退课" :span="24" :item-render="{}">
+          <template #default="{ data }">
+            <div class="radio-list">
+              <el-switch
+                v-model="classSetting.option2"
+                active-text="开启"
+                inactive-text="关闭"
+              ></el-switch>
+            </div>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item field="number" title="开启结课模式" :span="24" :item-render="{}">
+          <template #default="{ data }">
+            <div class="radio-list">
+              <el-switch
+                v-model="classSetting.option3"
+                active-text="开启"
+                inactive-text="关闭"
+              ></el-switch>
+            </div>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item
+          title="高级设置"
+          title-align="left"
+          title-
+          :title-width="200"
+          :span="24"
+        ></vxe-form-item>
+
+        <vxe-form-item align="center" title-align="left" :span="24">
+          <template #default>
+            <vxe-button type="submit" @click="saveSetting">确认设置</vxe-button>
           </template>
         </vxe-form-item>
       </vxe-form>
@@ -185,7 +259,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, onMounted } from "vue";
+import { ref, getCurrentInstance, onMounted, reactive } from "vue";
 const { proxy } = getCurrentInstance();
 import XEUtils from "xe-utils";
 //左侧处理班级逻辑
@@ -212,6 +286,8 @@ const classeItems = ref([
     description: "",
   },
 ]);
+const showAddClass = ref(false);
+const showClassSetting = ref(false);
 const formRules = ref({
   name: [{ required: true, message: "请输入班级名称", trigger: "blur" }],
   number: [{ required: true, message: "请输入班级人数", trigger: "blur" }],
@@ -226,6 +302,11 @@ const addedClass = ref({
   period: "",
   description: "",
 });
+const classSetting = ref({
+  option1: false,
+  option2: false,
+  option3: false,
+});
 //搜索班级
 const searchClass = ref("");
 // 当前选中的班级
@@ -236,24 +317,56 @@ const handleSelect = (index) => {
   );
 };
 const selectedClass = ref(classeItems.value[0].name);
+
+// 班级设置
+const item = reactive([
+  {
+    title: "消息提醒",
+    tip: "(关闭后，消息将不再进行提醒)",
+    status: false,
+  },
+  {
+    title: "私信智能拦截",
+    tip: "(开启后，将自动拦截疑似骚扰和不良的会话)",
+    status: false,
+  },
+]);
+//是新增还是编辑班级
+const type = ref();
+const showEdit1 = () => {
+  type.value = false;
+  showAddClass.value = true;
+};
+const showEdit2 = () => {
+  showClassSetting.value = true;
+};
 // 添加班级
 const addClass = () => {
-  type.value = false;
-  showEdit.value = true;
-
   // 这里应该打开一个对话框，让用户输入新班级的信息
   // 然后将新班级的信息发送到服务器
   // 为了简单起见，我们只是硬编码了一个新班级
 
   classeItems.value.push(addedClass);
+  showAddClass.value = false;
 };
-const editClass = () => {
-  type.value = true;
-  showEdit.value = true;
+const setClass = () => {
+  // 设置班级
+  showAddClass.value = false;
 };
-const showEdit = ref(false);
-//是新增还是编辑班级
-const type = ref();
+const resetClass = () => {
+  addedClass.value = {
+    name: "",
+    number: 0,
+    major: "",
+    period: "",
+    description: "",
+  };
+};
+const saveSetting = () => {
+  // 保存设置
+  showClassSetting.value = false;
+};
+
 //右侧表单逻辑处理
 // 班级成员列表
 const tableData = ref([
@@ -403,26 +516,22 @@ onMounted(() => {
   margin-top: 64px;
   .left-part {
     display: flex;
+    flex: 0 0 auto;
     align-content: center;
     justify-content: flex-start;
     flex-direction: column;
     max-height: calc(100vh - 80px);
-    overflow-y: auto;
+    width: 250px;
+    overflow: hidden;
     margin-right: 16px;
     margin-top: 16px;
-    .class-manage {
+    .buttons {
       display: flex;
-      border-top: 1px solid #cdc7c7;
-      border-right: 1px solid #cdc7c7;
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      .item {
+      .el-button {
         height: 48px;
         width: 100%;
         font-size: 1.3rem;
         line-height: 48px;
-        text-align: center;
-        cursor: pointer;
 
         &:hover {
           background-color: #ecf5ff;
@@ -430,8 +539,17 @@ onMounted(() => {
           color: #409eff;
         }
       }
-      .new {
-        border-right: 1px solid #cdc7c7;
+    }
+    .search {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 6px;
+      .el-button {
+        &:hover {
+          background-color: #ecf5ff;
+          font-weight: bold;
+          color: #409eff;
+        }
       }
     }
   }

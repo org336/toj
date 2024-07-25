@@ -1,11 +1,20 @@
 import path from 'path';
-let packagePath = path.dirname(new URL(import.meta.url).pathname) + "/../package.json";
-import pkg from "../package.json"  with { type: "json" };
-
-let version = pkg.version.split("v")[1].split(".")
-let r = /^\+?[1-9][0-9]*$/;
+import fs from 'fs';
+import pkg from "../package.json" with { type: "json" };
 import moment from 'moment';
 import { exit } from 'process';
+
+// 处理路径，以适应不同的操作系统
+function fixPathForOS(pathname) {
+  return process.platform === "win32" ? pathname.substring(1) : pathname;
+}
+
+// 获取正确的路径
+let packagePath = path.join(path.dirname(fixPathForOS(new URL(import.meta.url).pathname)), "../package.json");
+let versionPath = path.join(path.dirname(fixPathForOS(new URL(import.meta.url).pathname)), "../VERSION");
+
+let version = pkg.version.split("v")[1].split(".");
+let r = /^\+?[1-9][0-9]*$/;
 let dateValidation = moment().utcOffset(8).format(version[3], 'YYYYMMDDHHmmss', true);
 if (version.length != 4 || !r.test(version[0]) || !r.test(version[1]) || !r.test(version[2]) || dateValidation == "Invalid date") {
     console.error(`bad version: ${pkg.version}`);
@@ -47,7 +56,6 @@ else if (arg1 == "sec") {
 }
 pkg.version = `v${version[0]}.${version[1]}.${version[2]}.${version[3]}`;
 console.log(`new version: ${pkg.version}`);
-import fs from 'fs';
+
 fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2));
-let versionPath = path.dirname(new URL(import.meta.url).pathname) + "/../VERSION";
 fs.writeFileSync(versionPath, pkg.version);

@@ -1,5 +1,4 @@
 <template>
-  <popup-view ref="popupRef"></popup-view>
   <div class="home">
     <div class="nav" :class="extraClass">
       <div class="nav-start">
@@ -24,7 +23,7 @@
 
         <!-- 用户头像 -->
         <div class="avatar" @click="shiftProfile">
-          <el-avatar :src="profile.avatarUrl" shape="square">{{ profile.nickName }}</el-avatar>
+          <el-avatar :src="avatarUrl" shape="square">{{ profile.nickName }}</el-avatar>
         </div>
         <div class="right-arrow" @click="toggleRightSidebar">
           <i class="fas fa-chevron-left"></i>
@@ -70,10 +69,10 @@
       >
         <div class="sidebar-top">
           <div class="user">
-            <div class="user-avatar" @click="">
-              <el-avatar :src="profile.avatar" shape="square">{{ profile.username }}</el-avatar>
+            <div class="user-avatar">
+              <el-avatar :src="avatarUrl" shape="square">{{ profile.username }}</el-avatar>
             </div>
-            <div class="user-name">{{ profile.nickName }}</div>
+            <span class="user-name">{{ profile.nickName }}</span>
           </div>
           <div class="leave" @click="toggleRightSidebar">
             <i class="fas fa-times"></i>
@@ -82,12 +81,14 @@
 
         <div class="sidebar-bottom">
           <el-menu class="el-menu" :router="true">
-            <el-menu-item @click.native.prevent>{{ profile.signature }}</el-menu-item>
+            <el-menu-item @click.native.prevent>
+              <span class="signature">{{ profile.signature }}</span>
+            </el-menu-item>
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
             <el-menu-item index="/profile">
               <i class="fa-regular fa-user"></i> 个人信息
             </el-menu-item>
-            <el-menu-item index="/message/personal">
+            <el-menu-item index="/message/private">
               <i class="fa-regular fa-envelope"></i>邮箱消息</el-menu-item
             >
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
@@ -115,6 +116,7 @@
 </template>
 
 <script setup>
+import { ElMessage } from "element-plus";
 import { ref, getCurrentInstance, watch, computed, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
@@ -122,7 +124,6 @@ import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
-const popupRef = ref(null);
 //处理导航栏的样式变化
 const isExtra = ref(false);
 const checkScroll = () => {
@@ -168,9 +169,10 @@ const backToHome = () => {
 const store = useUserStore();
 useUserStore().getProfile();
 const { profile } = storeToRefs(store);
+const { avatarUrl } = storeToRefs(store);
 //点击切换用户消息
 const shiftMessage = () => {
-  router.push("/message/personal");
+  router.push("/message/private");
 };
 const shiftProfile = () => {
   router.push("/profile");

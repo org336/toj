@@ -11,7 +11,7 @@ export default defineConfig({
   },
   server: {
     host: "0.0.0.0",
-    port: 2048,
+    port: 3072, //前端端口号
     hmr: true,
     cors: true,
     proxy: {

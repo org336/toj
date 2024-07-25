@@ -7,10 +7,9 @@
 <script setup>
 import { UserService } from "@/utils/api";
 import { ref, onMounted, defineEmits } from "vue";
-const emit = defineEmits(["popup-message"]);
+import { ElMessage } from "element-plus";
 const siteKey = import.meta.env.VITE_SITE_KEY;
 const recaptcha = ref(null);
-const popupRef = ref(null);
 const recaptchaWidgetId = ref(null);
 onMounted(() => {
   // 确保grecaptcha对象已加载
@@ -34,13 +33,23 @@ onMounted(() => {
 const sendToServer = async () => {
   // 检查grecaptcha对象是否已加载且recaptchaWidgetId是否已设置
   if (!window.grecaptcha || recaptchaWidgetId.value === null) {
-    emit("message", "人机验证尚未准备好，请稍后再试");
+    ElMessage({
+      showClose: true,
+      message: "人机验证尚未准备好，请稍后再试",
+      type: "warning",
+      center: true,
+    });
     return false;
   }
   //前端请求Google获取token
   const recaptchaResponse = grecaptcha.getResponse(recaptchaWidgetId.value);
   if (!recaptchaResponse) {
-    emit("message", "请先完成人机验证");
+    ElMessage({
+      showClose: true,
+      message: "请先完成人机验证",
+      type: "warning",
+      center: true,
+    });
     return false;
   }
   //请求后端接口验证token的合法性

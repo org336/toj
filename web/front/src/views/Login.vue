@@ -1,5 +1,4 @@
 <template>
-  <popup-view ref="popupRef"></popup-view>
   <div class="container" ref="containerRef">
     <div class="forms-container">
       <div class="signin-signup">
@@ -13,21 +12,33 @@
         >
           <h2 class="title">重置密码</h2>
           <div class="input-field">
-            <i class="fa-solid fa-user"></i>
+            <i class="fa-regular fa-at"></i>
             <el-form-item prop="email">
-              <el-input v-model.trim="resetForm.email" placeholder="邮箱" clearable />
+              <el-input
+                type="text"
+                v-model.trim="resetForm.email"
+                placeholder="邮箱"
+                clearable
+              />
             </el-form-item>
           </div>
           <div class="emailCode-row">
             <div class="input-field emailCode">
               <i class="fas fa-envelope"></i>
               <el-form-item prop="emailCode">
-                <el-input v-model.trim="resetForm.emailCode" placeholder="验证码" />
+                <el-input
+                  type="number"
+                  v-model.trim="resetForm.emailCode"
+                  placeholder="验证码"
+                />
               </el-form-item>
             </div>
-            <el-button type="primary" class="btn" round @click="sendEmailCode('resetPwd')">
-              发送验证码
-            </el-button>
+            <CustomButton
+              :isLoading="loadingList.emailCodeLoading"
+              buttonText="发送验证码"
+              loadingText="发送中"
+              @click="sendEmailCode('resetPwd')"
+            ></CustomButton>
           </div>
           <div class="input-field">
             <i class="fa-solid fa-lock"></i>
@@ -54,15 +65,12 @@
             </el-form-item>
           </div>
           <div class="reset-line">
-            <el-button
-              type="primary"
-              :loading="resetLoading"
-              @click="reset(resetForm.value)"
-              class="btn form"
-              round
-            >
-              {{ resetLoading ? "重 置 中" : "点击重置" }}
-            </el-button>
+            <CustomButton
+              :isLoading="loadingList.resetLoading"
+              buttonText="点击重置"
+              loadingText="重置中"
+              @click="resetPassword"
+            ></CustomButton>
             <button type="reset" class="btn transparent link" @click="showResetLogin">
               去登陆!
             </button>
@@ -80,7 +88,12 @@
           <div class="input-field">
             <i class="fa-solid fa-user"></i>
             <el-form-item prop="email">
-              <el-input v-model.trim="loginForm.email" placeholder="邮箱" clearable />
+              <el-input
+                type="text"
+                v-model.trim="loginForm.email"
+                placeholder="邮箱"
+                clearable
+              />
             </el-form-item>
           </div>
           <div class="input-field">
@@ -97,15 +110,12 @@
           </div>
           <recaptcha-view ref="recaptchaRef" @message="handlePopupMessage"></recaptcha-view>
           <div class="reset-line">
-            <el-button
-              type="primary"
-              :loading="loginLoading"
-              @click="Login(loginForm.value)"
-              class="btn form"
-              round
-            >
-              {{ loginLoading ? "登 录 中" : "点击登录" }}
-            </el-button>
+            <CustomButton
+              :isLoading="loadingList.loginLoading"
+              buttonText="点击登录"
+              loadingText="登录中"
+              @click="Login"
+            ></CustomButton>
             <button type="reset" class="btn transparent link" @click="showReset">
               忘记密码？
             </button>
@@ -121,26 +131,43 @@
         >
           <h2 class="title">注册</h2>
           <div class="input-field">
-            <i class="fa-solid fa-user"></i>
+            <i class="fa-regular fa-at"></i>
             <el-form-item prop="email">
-              <el-input v-model.trim="signUpForm.email" clearable placeholder="邮箱" />
+              <el-input
+                type="text"
+                v-model.trim="signUpForm.email"
+                clearable
+                placeholder="邮箱"
+              />
             </el-form-item>
           </div>
           <div class="emailCode-row">
             <div class="input-field emailCode">
               <i class="fas fa-envelope"></i>
               <el-form-item prop="emailCode">
-                <el-input v-model.trim="signUpForm.emailCode" placeholder="验证码" />
+                <el-input
+                  type="number"
+                  v-model.trim="signUpForm.emailCode"
+                  placeholder="验证码"
+                />
               </el-form-item>
             </div>
-            <el-button type="primary" class="btn" round @click="sendEmailCode('register')">
-              发送验证码
-            </el-button>
+            <CustomButton
+              :isLoading="loadingList.emailCodeLoading"
+              buttonText="发送验证码"
+              loadingText="发送中"
+              @click="sendEmailCode('register')"
+            ></CustomButton>
           </div>
           <div class="input-field">
             <i class="fa-solid fa-id-card"></i>
             <el-form-item prop="userId">
-              <el-input v-model.trim="signUpForm.userId" clearable placeholder="学号" />
+              <el-input
+                type="number"
+                v-model.trim="signUpForm.userId"
+                clearable
+                placeholder="学工号"
+              />
             </el-form-item>
           </div>
           <div class="input-field">
@@ -167,15 +194,12 @@
               />
             </el-form-item>
           </div>
-          <el-button
-            type="primary"
-            :loading="signUploading"
-            @click="SignUp(signUpForm.value)"
-            class="btn form"
-            round
-          >
-            {{ signUploading ? "注 册 中" : "点击注册" }}
-          </el-button>
+          <CustomButton
+            buttonText="点击注册"
+            loadingText="注册中"
+            @click="SignUp"
+            :isLoading="loadingList.signUploading"
+          ></CustomButton>
         </el-form>
       </div>
     </div>
@@ -202,34 +226,29 @@
 </template>
 
 <script setup>
+import { ElMessage } from "element-plus";
 import { UserService } from "@/utils/api";
-import { ref, getCurrentInstance } from "vue";
+import { ref, getCurrentInstance, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { LocalStorage } from "@/utils/storage";
+import { myLocalStorage } from "@/utils/storage";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
-const loginLoading = ref(false);
-const signUploading = ref(false);
-const resetLoading = ref(false);
+const loadingList = reactive({
+  loginLoading: false,
+  signUploading: false,
+  resetLoading: false,
+  emailCodeLoading: false,
+});
 const loginRef = ref(null);
 const signUpRef = ref(null);
 const resetRef = ref(null);
 const recaptchaRef = ref(null);
-const popupRef = ref(null);
-// email: "",
-//   password: "",
+
 const loginForm = ref({});
-// email: "",
-//   emailCode: "",
-//   studentId: "",
-//   password: "",
-//   confirmPassword: "",
+
 const signUpForm = ref({});
-// email: "",
-//   emailCode: "",
-//   password: "",
-//   newPassword: "",
+
 const resetForm = ref({});
 
 const loginRules = {
@@ -249,8 +268,8 @@ const signUpRules = {
   ],
   emailCode: [{ required: true, message: "请输入验证码" }],
   userId: [
-    { required: true, message: "请输入学号" },
-    { validator: proxy.Verify.studentId, message: "学号不存在", trigger: "blur" },
+    { required: true, message: "请输入学工号" },
+    { validator: proxy.Verify.userId, message: "学工号不存在", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码" },
@@ -287,7 +306,7 @@ const resetRules = {
     { required: true, message: "请输入新密码" },
     {
       validator: (rule, value, callback) =>
-        proxy.Verify.resetPassword(rule, value, callback, resetForm.value.password),
+        proxy.Verify.confirmPassword(rule, value, callback, resetForm.value.password),
       trigger: "blur",
     },
   ],
@@ -300,43 +319,62 @@ const Login = async () => {
     if (valid) {
       const validateRecaptcha = await recaptchaRef.value.sendToServer();
       if (validateRecaptcha) {
-        loginLoading.value = true;
+        loadingList.loginLoading = true;
         let params = {};
         Object.assign(params, loginForm.value);
-        const result = await UserService.login(params);
-        if (result.code == 200) {
-          popupRef.value.show("登录成功!");
-          LocalStorage.set("user_uid", result.data.uid);
-          LocalStorage.set("user_identity", result.data.identity);
-          proxy.VueCookies.set("LOGIN_STATUS", 1, "3d");
-          router.push({ name: "Home" });
-        } else if (result.code == 404) {
-          popupRef.value.show("请先注册邮箱!");
-        } else if (result.code == 402) {
-          popupRef.value.show("密码错误!");
-        } else {
-          popupRef.value.show(result.msg);
-        }
-        loginLoading.value = false;
+        await UserService.login(params)
+          .then((res) => {
+            if (res.code == 200) {
+              ElMessage({
+                message: "登录成功",
+                type: "success",
+                center: true,
+              });
+              myLocalStorage.set("user_uid", res.data.uid);
+              myLocalStorage.set("user_identity", res.data.identity);
+              proxy.VueCookies.set("LOGIN_STATUS", 1, "3d");
+              router.push({ name: "Home" });
+            } else {
+              ElMessage({
+                showClose: true,
+                message: res.msg,
+                type: "warning",
+                center: true,
+              });
+            }
+          })
+          .finally(() => {
+            loadingList.loginLoading = false;
+          });
       }
     }
   });
 };
-
 const SignUp = () => {
   signUpRef.value.validate(async (valid) => {
     if (valid) {
-      signUploading.value = true;
+      loadingList.signUploading = true;
       let params = {};
       Object.assign(params, signUpForm.value);
       const result = await UserService.register(params);
       if (result.code == 200) {
-        popupRef.value.show("注册成功");
+        ElMessage({
+          showClose: true,
+          message: "注册成功，请登录",
+          type: "success",
+          center: true,
+        });
         showSignIn();
       } else {
-        popupRef.value.show(result.msg);
+        ElMessage({
+          showClose: true,
+          message: result.msg,
+          type: "error",
+          center: true,
+        });
       }
-      signUploading.value = false;
+      loadingList.signUploading = false;
+      loginForm.email = signUpForm.email;
     }
   });
 };
@@ -352,35 +390,63 @@ const sendEmailCode = (purpose) => {
   }
   validateRef.value.validateField("email", async (valid) => {
     if (valid) {
+      loadingList.emailCodeLoading = true;
       let params = {
         email: email,
         purpose: purpose,
       };
-      UserService.sendEmailCode(params).then((res) => {
-        if (res.code == 200) {
-          popupRef.value.show("验证码发送成功");
-        } else {
-          popupRef.value.show(res.msg);
-        }
-      });
+      UserService.sendEmailCode(params)
+        .then((res) => {
+          if (res.code == 200) {
+            ElMessage({
+              showClose: true,
+              message: "发送验证码成功，请注意查收",
+              type: "success",
+              center: true,
+            });
+          } else {
+            ElMessage({
+              showClose: true,
+              message: res.msg,
+              type: "error",
+              center: true,
+            });
+          }
+        })
+        .finally(() => {
+          loadingList.emailCodeLoading = false;
+        });
     }
   });
 };
-const reset = () => {
+const resetPassword = () => {
   resetRef.value.validate((valid) => {
     if (valid) {
-      resetLoading.value = true;
+      loadingList.resetLoading = true;
       let params = {};
       Object.assign(params, resetForm.value);
-      UserService.resetPwd(params).then((res) => {
-        if (res.code == 200) {
-          popupRef.value.show("重置密码成功");
-          showResetLogin();
-        } else {
-          popupRef.value.show(res.msg);
-        }
-        resetLoading.value = false;
-      });
+      UserService.resetPwd(params)
+        .then((res) => {
+          if (res.code == 200) {
+            ElMessage({
+              showClose: true,
+              message: "重置密码成功",
+              type: "success",
+              center: true,
+            });
+            showResetLogin();
+          } else {
+            ElMessage({
+              showClose: true,
+              message: res.msg,
+              type: "error",
+              center: true,
+            });
+          }
+        })
+        .finally(() => {
+          loadingList.resetLoading = false;
+        });
     }
   });
 };
