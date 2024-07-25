@@ -21,13 +21,6 @@ export class AuthService {
     res: Response,
   ): Promise<any> {
     const user = await this.userService.findOneByEmail(credentials.email);
-    if (!user) {
-      throw new ApiException(
-        '找不到该用户',
-        ApiCode.NOT_FOUND,
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
     const isMatch = await BcryptUtils.comparePassword(
       credentials.password,
       user.password,

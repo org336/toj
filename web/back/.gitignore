@@ -52,3 +52,6 @@ ehthumbs.db
 
 # Linux
 *~
+
+# 忽略 src/public/avatars 目录下的所有文件
+src/public/avatars/*

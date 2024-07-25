@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
+import { UserEntity } from '../user/user.entity';
 import { BodyEntity } from './body.entity';
 import { BodySystemEntity } from './body-system.entity';
 import { StatusSystemEntity } from './status-system.entity';
@@ -8,11 +9,13 @@ import { StatusPrivateEntity } from './status-private.entity';
 import { BodyPrivateEntity } from './body-private.entity';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
+import { ProfileDto } from '../user/profile.dto';
 import { formatDateTime } from '~/utils/timeformat.util';
-import { log } from 'console';
 @Injectable()
 export class MessageService {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(BodyEntity)
     private readonly bodyRepository: Repository<BodyEntity>,
     @InjectRepository(BodySystemEntity)
@@ -25,7 +28,7 @@ export class MessageService {
     private readonly statusPrivateRepository: Repository<StatusPrivateEntity>,
   ) {}
   async getSystemMessage(uid: string): Promise<any> {
-    // 首先在BodySystemRepository中查找指定uid的记录
+    // 首先在关系表中查找指定uid的记录
     let bodySystemRecord = await this.bodySystemRepository.findOne({
       where: { user_uid: uid },
     });
@@ -71,8 +74,10 @@ export class MessageService {
       });
       await this.statusSystemRepository.save(statusSystemRecord);
     } else {
-      statusSystemRecord.last_read_time = currentTime;
-      await this.statusSystemRepository.save(statusSystemRecord);
+      await this.statusSystemRepository.update(
+        { id: statusSystemRecord.id },
+        { last_read_time: currentTime },
+      );
     }
   }
   async updateStatusPrivate(
@@ -92,34 +97,52 @@ export class MessageService {
       await this.statusPrivateRepository.save(statusPrivateRecord);
     } else {
       statusPrivateRecord.last_read_time = currentTime;
-      await this.statusPrivateRepository.save(statusPrivateRecord);
+      await this.statusPrivateRepository.update(
+        { id: statusPrivateRecord.id },
+        { last_read_time: currentTime },
+      );
     }
   }
   async getPrivateMessage(receiver_uid: string): Promise<any> {
-    // 先找找出当前用户是否有私人消息
-    const msg_ids = await this.bodyPrivateRepository.find({
-      select: ['msg_id', 'sender_uid'],
-      where: { receiver_uid },
-    });
-    if (!msg_ids) {
-      return null;
-    }
-    // 找出当前用户的所有的私人消息
-    const messages = await Promise.all(
-      msg_ids.map(async (msg) => {
-        const message = await this.bodyRepository.findOne({
-          where: { id: msg.msg_id },
-        });
-        return message ? { ...message, sender_uid: msg.sender_uid } : null;
-      }),
+    // 先找出当前用户是否有私人消息
+    const queryResult = await this.bodyPrivateRepository.query(
+      `
+    SELECT 
+      sender_uid, 
+      GROUP_CONCAT(msg_id ORDER BY msg_id DESC) AS msg_ids
+    FROM 
+      message_body_private
+    WHERE 
+      receiver_uid = ?
+    GROUP BY 
+      sender_uid;
+  `,
+      [receiver_uid],
     );
-    // 将所有消息按照发送人进行分组，返回格式为
-    const groupedMessages = messages.reduce((acc, message) => {
-      (acc[message.sender_uid] = acc[message.sender_uid] || []).push(message);
-      return acc;
-    }, {});
+    if (!queryResult) {
+      throw new ApiException(
+        '未找到用户的任何私人消息',
+        ApiCode.BUSINESS_ERROR,
+        400,
+      );
+    }
+    const result = [];
+    for (const item of queryResult) {
+      const msgIds = item.msg_ids.split(',');
+      // 找出当前用户的所有的私人消息以及发送人信息
+      const sender = await this.userRepository.findOne({
+        where: { uid: item.sender_uid },
+      });
+      const messages = await this.bodyRepository.find({
+        where: { id: In(msgIds) },
+      });
 
-    return groupedMessages;
+      result.push({
+        sender: new ProfileDto(sender),
+        messages: messages,
+      });
+    }
+    return result;
   }
   async createPrivateMessage(
     sender_uid: string,
@@ -140,7 +163,7 @@ export class MessageService {
     if (!message || !message.id) {
       throw new ApiException('私人消息创建失败', ApiCode.BUSINESS_ERROR, 400);
     }
-    //  使用得到的消息ID，在bodyPrivateRepository插入发送者和接收者的关系
+    //  使用得到的消息ID，在关系表插入发送者和接收者的关系
     const privateMessage = await this.bodyPrivateRepository.save({
       msg_id: message.id,
       sender_uid,

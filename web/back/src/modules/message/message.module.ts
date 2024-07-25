@@ -7,11 +7,13 @@ import { BodySystemEntity } from './body-system.entity';
 import { StatusSystemEntity } from './status-system.entity';
 import { BodyPrivateEntity } from './body-private.entity';
 import { StatusPrivateEntity } from './status-private.entity';
+import { UserEntity } from '../user/user.entity';
 @Module({
   controllers: [MessageController],
   providers: [MessageService],
   imports: [
     TypeOrmModule.forFeature([
+      UserEntity,
       BodyEntity,
       BodySystemEntity,
       StatusSystemEntity,

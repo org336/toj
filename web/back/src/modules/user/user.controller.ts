@@ -49,7 +49,7 @@ export class UserController {
   }
   // 修改用户密码
   @ApiBody({
-    description: '修改密码样例',
+    description: '重置密码样例',
     type: 'object',
     schema: {
       properties: {
@@ -60,11 +60,28 @@ export class UserController {
     },
   })
   @Public()
-  @Put('password')
+  @Put('password-reset')
   async changePassword(
     @Body() data: { email: string; emailCode: string; newPassword: string },
   ) {
-    return await this.userService.changePassword(data);
+    return await this.userService.resetPassword(data);
+  }
+  @ApiBody({
+    description: '更新密码样例',
+    type: 'object',
+    schema: {
+      properties: {
+        uid: { type: 'string', example: '' },
+        oldPassword: { type: 'string', example: 'test123456!' },
+        newPassword: { type: 'string', example: 'test123456~' },
+      },
+    },
+  })
+  @Put('password-update')
+  async updatePassword(
+    @Body() data: { uid: string; oldPassword: string; newPassword: string },
+  ) {
+    return await this.userService.updatePassword(data);
   }
   // 发送邮箱验证码
   @ApiBody({
@@ -108,6 +125,18 @@ export class UserController {
   async validate(@Body('token') token: string): Promise<boolean> {
     return await this.recaptchaService.validateToken(token);
   }
+  @ApiBody({
+    description: '获取用户信息',
+    type: 'object',
+    schema: {
+      properties: {
+        uid: {
+          type: 'string',
+          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
+        },
+      },
+    },
+  })
   @Post('profile')
   async getProfile(@Body() data: { uid: string }) {
     return await this.userService.getProfile(data.uid);

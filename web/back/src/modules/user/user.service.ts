@@ -9,6 +9,7 @@ import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
 import { CommonService } from '~/common/common.service';
 import { ProfileDto } from './profile.dto';
+import { log } from 'console';
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
@@ -16,13 +17,14 @@ export class UserService {
     private readonly emailService: EmailService,
     private readonly commonService: CommonService,
   ) {}
+
   async findOneByEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
     });
     if (!user)
       throw new ApiException(
-        '找不到该用户',
+        '用户不存在，请先去注册',
         ApiCode.NOT_FOUND,
         HttpStatus.NOT_FOUND,
       );
@@ -34,13 +36,23 @@ export class UserService {
     });
     if (!user)
       throw new ApiException(
-        '找不到该用户',
+        '用户不存在，请先去注册',
         ApiCode.NOT_FOUND,
         HttpStatus.NOT_FOUND,
       );
     return user;
   }
-
+  async updateAvatarUrl(uid: string, avatarUrl: string) {
+    const user = await this.findOneByUid(uid);
+    let oldAvatarUrl = user.avatarUrl;
+    await this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ avatarUrl: avatarUrl })
+      .where('uid = :uid', { uid: uid })
+      .execute();
+    return oldAvatarUrl;
+  }
   async register(user: {
     email: string;
     emailCode: string;
@@ -67,7 +79,7 @@ export class UserService {
     return { uid, email: user.email };
   }
 
-  async changePassword(data: {
+  async resetPassword(data: {
     email: string;
     emailCode: string;
     newPassword: string;
@@ -77,6 +89,22 @@ export class UserService {
 
     await this.emailService.verifyEmailCode(emailKey, data.emailCode);
 
+    user.password = await BcryptUtils.hashPassword(data.newPassword);
+    await this.userRepository.save(user);
+  }
+  async updatePassword(data: {
+    uid: string;
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<void> {
+    const user = await this.findOneByUid(data.uid);
+    if (!BcryptUtils.comparePassword(data.oldPassword, user.password)) {
+      throw new ApiException(
+        '原始密码错误',
+        ApiCode.PARAMS_ERROR,
+        HttpStatus.CONFLICT,
+      );
+    }
     user.password = await BcryptUtils.hashPassword(data.newPassword);
     await this.userRepository.save(user);
   }
@@ -97,6 +125,7 @@ export class UserService {
     avatarUrl: string;
   }) {
     const user = await this.findOneByUid(data.uid);
+
     // 更新用户资料
     try {
       user.nickName = data.nickName;

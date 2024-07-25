@@ -14,7 +14,7 @@ import { UserModule } from '../user/user.module';
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: '3d', //3天有效时间
+            expiresIn: '3d', //登录令牌的有效时间
           },
         };
       },

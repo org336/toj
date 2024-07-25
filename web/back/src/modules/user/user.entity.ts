@@ -3,10 +3,10 @@ import { Entity, Column, PrimaryColumn, Unique } from 'typeorm';
 @Entity('user')
 @Unique(['userId', 'email'])
 export class UserEntity {
-  @PrimaryColumn({ type: 'varchar', length: 36, comment: '学生唯一标识符' })
+  @PrimaryColumn({ type: 'varchar', length: 36, comment: '用户唯一标识符' })
   uid: string;
 
-  @Column({ name: 'user_id', type: 'varchar', length: 16, comment: '学生学号' })
+  @Column({ name: 'user_id', type: 'varchar', length: 16, comment: '用户号' })
   userId: string;
 
   @Column({ type: 'varchar', length: 64, comment: '邮箱' })
