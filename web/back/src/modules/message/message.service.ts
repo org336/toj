@@ -2,15 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
-import { BodyEntity } from './body.entity';
-import { BodySystemEntity } from './body-system.entity';
-import { StatusSystemEntity } from './status-system.entity';
-import { StatusPrivateEntity } from './status-private.entity';
-import { BodyPrivateEntity } from './body-private.entity';
+import { StatusSystemEntity, StatusPrivateEntity } from './status.entity';
+import { BodyEntity, BodyPrivateEntity, BodySystemEntity } from './body.entity';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { ProfileDto } from '../user/profile.dto';
-import { formatDateTime } from '~/utils/timeformat.util';
 @Injectable()
 export class MessageService {
   constructor(
@@ -103,7 +99,31 @@ export class MessageService {
       );
     }
   }
-  async getPrivateMessage(receiver_uid: string): Promise<any> {
+  async getPrivateMessage(
+    sender_uid: string,
+    receiver_uid: string,
+  ): Promise<any> {
+    // 先找出两个用户之间是否存在私人消息
+    const queryResult = await this.bodyPrivateRepository.find({
+      where: { sender_uid, receiver_uid },
+    });
+    if (!queryResult) {
+      throw new ApiException(
+        '未找到双方的任何私人消息',
+        ApiCode.BUSINESS_ERROR,
+        400,
+      );
+    }
+    const result = [];
+    for (const item of queryResult) {
+      const message = await this.bodyRepository.findOne({
+        where: { id: item.msg_id },
+      });
+      result.push(message);
+    }
+    return result;
+  }
+  async getAllPrivateMessage(receiver_uid: string): Promise<any> {
     // 先找出当前用户是否有私人消息
     const queryResult = await this.bodyPrivateRepository.query(
       `

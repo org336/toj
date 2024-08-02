@@ -37,7 +37,7 @@ export class AuthService {
       uid: user.uid,
     };
     const jwt = await this.jwtService.signAsync(payload);
-    // 设置HttpOnly Cookie
+    // 在浏览器设置HttpOnly Cookie的用户唯一令牌
     res.cookie('JWTOKEN', jwt, {
       httpOnly: true,
       secure: false, // 开发环境暂时使用HTTP,在生产环境中确保使用HTTPS

@@ -9,7 +9,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ProfileDto } from './profile.dto';
+import { EmailService } from '~/shared/mailer/email.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Public } from '~/common/decorators/common.decorator';
 import { RecaptchaService } from '~/shared/recaptcha/recaptcha.service';
@@ -19,6 +19,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly recaptchaService: RecaptchaService,
+    private readonly emailService: EmailService,
   ) {}
 
   // 注册新用户
@@ -97,7 +98,7 @@ export class UserController {
   @Public()
   @Post('email')
   async sendEmailCode(@Body() data: { email: string; purpose: string }) {
-    return await this.userService.sendEmailCode(data.email, data.purpose);
+    return await this.emailService.sendEmailCode(data.email, data.purpose);
   }
   @ApiBody({
     description: '获取用户信息',

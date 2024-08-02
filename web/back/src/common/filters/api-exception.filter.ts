@@ -13,7 +13,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
     const status = exception.getStatus();
-
+    //处理正常捕获的错误
     if (exception instanceof ApiException) {
       response.status(status).json({
         code: (exception as ApiException).gerErrorCode(),
@@ -21,7 +21,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
         path: request.url,
       });
     } else {
-      // 处理非手动抛出的情况
+      // 处理非手动捕获的错误
       response.status(status).json((exception as HttpException).getResponse());
     }
   }

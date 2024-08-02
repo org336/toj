@@ -99,7 +99,22 @@ export class EmailService {
       );
     }
   }
-
+  // 发送欢迎邮箱
+  async sendWelcomeEmail(email: string): Promise<void> {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '欢迎加入蓝鲸',
+        template: 'welcome.ejs',
+      });
+    } catch (error) {
+      throw new ApiException(
+        error,
+        ApiCode.BUSINESS_ERROR,
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
   // 使用模板发送验证码到指定邮箱
   async sendEmailCode(email: string, purpose: string): Promise<void> {
     const code = this.generateVerificationCode();

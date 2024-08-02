@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { CustomRedisModule } from './shared/redis/redis.module';
 import { DatabaseModule } from './shared/database/database.module';
+import { QueueModule } from './modules/queue/queue.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
@@ -11,10 +12,9 @@ import { MessageModule } from './modules/message/message.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ApiInterceptor } from './common/interceptors/api.interceptor';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
-import { RecaptchaModule } from './shared/recaptcha/recaptcha.module';
 import { AxiosModule } from './shared/axios/axios.module';
 import { UploaderModule } from './modules/uploader/uploader.module';
-
+import { SocketModule } from './modules/socket/socket.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,9 +24,10 @@ import { UploaderModule } from './modules/uploader/uploader.module';
     }),
     UserModule,
     MessageModule,
+    SocketModule,
     AxiosModule,
-    RecaptchaModule,
     CommonModule,
+    QueueModule,
     UploaderModule,
     CustomRedisModule,
     DatabaseModule,

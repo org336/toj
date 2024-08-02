@@ -8,7 +8,6 @@ import path from 'path';
   providers: [EmailService],
   imports: [
     MailerModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         transport: {

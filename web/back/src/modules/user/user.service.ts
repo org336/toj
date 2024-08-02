@@ -9,7 +9,7 @@ import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
 import { CommonService } from '~/common/common.service';
 import { ProfileDto } from './profile.dto';
-import { log } from 'console';
+
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
@@ -74,7 +74,8 @@ export class UserService {
     await this.emailService.verifyEmailCode(emailKey, user.emailCode);
     const uid = uuid();
     user.password = await BcryptUtils.hashPassword(user.password);
-    const newuser = this.userRepository.create({ ...user, uid });
+    //默认为普通游客
+    const newuser = this.userRepository.create({ ...user, uid, identity: 0 });
     await this.userRepository.save(newuser);
     return { uid, email: user.email };
   }
@@ -107,9 +108,6 @@ export class UserService {
     }
     user.password = await BcryptUtils.hashPassword(data.newPassword);
     await this.userRepository.save(user);
-  }
-  async sendEmailCode(email: string, func: string) {
-    return this.emailService.sendEmailCode(email, func);
   }
   async getProfile(uid: string) {
     const user = await this.findOneByUid(uid);

@@ -42,3 +42,56 @@ export class BodyEntity {
   })
   update_time: Date;
 }
+@Entity('message_body_system')
+export class BodySystemEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar', length: 36, nullable: true, comment: '接收者UID' })
+  user_uid: string;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    comment: '关系创建时间',
+  })
+  create_time: Date;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+    comment: '操作更新时间',
+  })
+  update_time: Date;
+}
+@Entity('message_body_private')
+export class BodyPrivateEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'int', nullable: true })
+  msg_id: number;
+
+  @Column({ type: 'varchar', length: 45, nullable: true, comment: '发送者UID' })
+  sender_uid: string;
+
+  @Column({ type: 'varchar', length: 45, nullable: true, comment: '接收者UID' })
+  receiver_uid: string;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  create_time: Date;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  update_time: Date;
+}

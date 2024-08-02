@@ -1,5 +1,5 @@
 import { Module, Global, Logger } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 import { RedisService } from './redis.service';
 
@@ -8,11 +8,11 @@ import { RedisService } from './redis.service';
   providers: [
     {
       provide: 'REDIS_CLIENT',
-      useFactory: (configService: ConfigService): Redis => {
+      useFactory: async (configService: ConfigService): Promise<Redis> => {
         const redis = new Redis({
           host: configService.get<string>('REDIS_HOST'),
           port: configService.get<number>('REDIS_PORT'),
-          db: configService.get<number>('REDIS_DB'),
+          db: configService.get<number>('REDIS_DB_0'),
         });
         redis.on('error', (err) => {
           if ((err as NodeJS.ErrnoException).code === 'ECONNREFUSED') {
