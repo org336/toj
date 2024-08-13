@@ -18,7 +18,18 @@
         <!-- 消息图标 -->
 
         <div class="msg-bell" @click="shiftMessage">
-          <i class="fa-sharp fa-regular fa-bell"></i>
+          <el-dropdown size="large" @command="handleCommand">
+            <i class="fa-sharp fa-regular fa-bell"></i>
+            <template #dropdown>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="MessagePrivate">私人消息</el-dropdown-item>
+                <el-dropdown-item command="MessageTeacher">老师消息</el-dropdown-item>
+                <el-dropdown-item command="MessageSystem">系统消息</el-dropdown-item>
+                <el-dropdown-item command="MessageMy">我的消息</el-dropdown-item>
+                <el-dropdown-item command="MessageSetting">消息设置</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
 
         <!-- 用户头像 -->
@@ -94,9 +105,7 @@
             <el-menu-item class="divider" @click.native.prevent></el-menu-item>
             <el-menu-item index="/course"> <i class="fas fa-book"></i> 课程列表 </el-menu-item>
             <el-menu-item index="/class"> <i class="fas fa-users"></i> 班级管理 </el-menu-item>
-            <el-menu-item index="addCourse">
-              <i class="fas fa-plus"></i> 课程添加
-            </el-menu-item>
+            <el-menu-item index="/todo"> <i class="fas fa-plus"></i> 课程添加 </el-menu-item>
             <el-menu-item index="/task"> <i class="fas fa-tasks"></i> 任务管理 </el-menu-item>
             <el-menu-item index="/homework">
               <i class="fas fa-pencil-alt"></i> 作业列表
@@ -114,8 +123,8 @@
     <div class="footer"></div>
   </div>
 </template>
-
 <script setup>
+import { myLocalStorage } from "@/utils/storage";
 import { ElMessage } from "element-plus";
 import { ref, getCurrentInstance, watch, computed, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
@@ -124,6 +133,10 @@ import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const { proxy } = getCurrentInstance();
+//处理消息下拉栏的路由跳转
+const handleCommand = (command) => {
+  router.push({ name: command });
+};
 //处理导航栏的样式变化
 const isExtra = ref(false);
 const checkScroll = () => {
@@ -179,10 +192,10 @@ const shiftProfile = () => {
 };
 // 事件
 const logout = () => {
-  //删除浏览器的本地存储和cookie
+  //删除浏览器的localstorage和cookie
   proxy.VueCookies.remove("LOGIN_STATUS");
-  LocalStorage.remove("user_uid");
-  LocalStorage.remove("user_identity");
+  myLocalStorage.remove("user_uid");
+  myLocalStorage.remove("user_identity");
 };
 //主动加载home-page组件
 onMounted(() => {

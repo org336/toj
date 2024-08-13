@@ -11,22 +11,22 @@ import { ElMessage } from "element-plus";
 const siteKey = import.meta.env.VITE_SITE_KEY;
 const recaptcha = ref(null);
 const recaptchaWidgetId = ref(null);
+const checkRecaptchaLoaded = () => {
+  // 检查是否已经渲染了reCAPTCHA
+  if (window.grecaptcha && window.grecaptcha.render) {
+    //如果没有grecaptcha对象则进行渲染
+    if (!recaptchaWidgetId.value) {
+      recaptchaWidgetId.value = grecaptcha.render(recaptcha.value, {
+        sitekey: siteKey,
+      });
+    } else {
+      // 如果grecaptcha对象还未加载，稍后再试
+      setTimeout(checkRecaptchaLoaded, 500);
+    }
+  }
+};
 onMounted(() => {
   // 确保grecaptcha对象已加载
-  const checkRecaptchaLoaded = () => {
-    // 检查是否已经渲染了reCAPTCHA
-    if (window.grecaptcha && window.grecaptcha.render) {
-      //如果没有grecaptcha对象则进行渲染
-      if (!recaptchaWidgetId.value) {
-        recaptchaWidgetId.value = grecaptcha.render(recaptcha.value, {
-          sitekey: siteKey,
-        });
-      } else {
-        // 如果grecaptcha对象还未加载，稍后再试
-        setTimeout(checkRecaptchaLoaded, 500);
-      }
-    }
-  };
   checkRecaptchaLoaded();
 });
 // 将token发送到服务器验证
@@ -35,7 +35,7 @@ const sendToServer = async () => {
   if (!window.grecaptcha || recaptchaWidgetId.value === null) {
     ElMessage({
       showClose: true,
-      message: "人机验证尚未准备好，请稍后再试",
+      message: "人机验证初始化失败，请刷新重试",
       type: "warning",
       center: true,
     });

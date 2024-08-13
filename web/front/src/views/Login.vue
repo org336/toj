@@ -325,11 +325,6 @@ const Login = async () => {
         await UserService.login(params)
           .then((res) => {
             if (res.code == 200) {
-              ElMessage({
-                message: "登录成功",
-                type: "success",
-                center: true,
-              });
               myLocalStorage.set("user_uid", res.data.uid);
               myLocalStorage.set("user_identity", res.data.identity);
               proxy.VueCookies.set("LOGIN_STATUS", 1, "3d");

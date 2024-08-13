@@ -1,9 +1,8 @@
 import { defineStore } from "pinia";
-import { computed, reactive, ref, toRaw } from "vue";
+import { computed, reactive, toRaw } from "vue";
 import { UserService } from "@/utils/api";
 import { ElMessage } from "element-plus";
-import { myLocalStorage } from "@/utils/storage";
-import { pa } from "element-plus/es/locale";
+
 interface UserProfile {
   email: string;
   nickName: string;
@@ -26,7 +25,7 @@ export const useUserStore = defineStore("user", () => {
   });
   const avatarUrl = computed(() => `${VITE_STATIC_PATH}${profile.avatarUrl}`);
   const updateProfile = async () => {
-    let params = { uid: myLocalStorage.get("user_uid"), ...toRaw(profile) };
+    let params = { uid: localStorage.getItem("user_uid"), ...toRaw(profile) };
     const result = await UserService.updateProfile(params);
     if (result.code == 200) {
       ElMessage({
@@ -45,7 +44,7 @@ export const useUserStore = defineStore("user", () => {
   };
 
   const getProfile = async () => {
-    const uid: string = myLocalStorage.get("user_uid");
+    const uid: string = localStorage.getItem("user_uid");
     let result = await UserService.getProfile({ uid: uid });
     if (result.code == 200) {
       Object.assign(profile, result.data);

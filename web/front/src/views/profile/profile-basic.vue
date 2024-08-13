@@ -83,8 +83,12 @@ const { profile } = storeToRefs(store);
 const { avatarUrl } = storeToRefs(store);
 const updateProfile = async () => {
   loadingList.profileLoading = true;
-  await store.updateProfile();
-  loadingList.profileLoading = false;
+  await store
+    .updateProfile()
+    .then(() => {})
+    .finally(() => {
+      loadingList.profileLoading = false;
+    });
 };
 const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 const profileRules = {

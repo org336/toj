@@ -92,6 +92,38 @@ const router = createRouter({
           path: "/task",
           name: "TaskPage",
           component: () => import("@/views/task/task-page.vue"),
+          children: [
+            {
+              path: "",
+              name: "TaskOverview",
+              component: () => import("@/views/task/task-overview.vue"),
+            },
+            {
+              path: "dashboard",
+              name: "TaskDashboard",
+              component: () => import("@/views/task/task-dashboard.vue"),
+            },
+            {
+              path: "setting",
+              name: "TaskSetting",
+              component: () => import("@/views/task/task-setting.vue"),
+            },
+            {
+              path: "create",
+              name: "CreateTask",
+              component: () => import("@/views/task/create-task.vue"),
+            },
+            {
+              path: "setting",
+              name: "TaskSetting",
+              component: () => import("@/views/task/task-setting.vue"),
+            },
+          ],
+        },
+        {
+          path: "/todo",
+          name: "TodoPage",
+          component: () => import("@/views/todo/todo-page.vue"),
         },
       ],
     },

@@ -5,13 +5,13 @@
         <div class="title">
           <div class="title-name">消息中心</div>
         </div>
-        <el-menu @select="handleSelect" default-active="private">
-          <el-menu-item index="private">{{ messgaeTypes.private }}</el-menu-item>
-          <el-menu-item index="teacher">{{ messgaeTypes.teacher }}</el-menu-item>
-          <el-menu-item index="system">{{ messgaeTypes.system }}</el-menu-item>
-          <el-menu-item index="my">{{ messgaeTypes.my }}</el-menu-item>
+        <el-menu @select="handleSelect" :default-active="activeMenu">
+          <el-menu-item index="MessagePrivate">私人消息</el-menu-item>
+          <el-menu-item index="MessageTeacher">老师消息</el-menu-item>
+          <el-menu-item index="MessageSystem">系统通知</el-menu-item>
+          <el-menu-item index="MessageMy">我的消息</el-menu-item>
           <div class="divided-line"></div>
-          <el-menu-item index="setting">{{ messgaeTypes.setting }}</el-menu-item>
+          <el-menu-item index="MessageSetting">消息设置</el-menu-item>
         </el-menu>
       </div>
     </div>
@@ -26,26 +26,32 @@
 </template>
 
 <script setup>
-import router from "@/router";
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, watchEffect } from "vue";
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
 const store = useUserStore();
 const { profile } = storeToRefs(store);
+const activeMenu = ref(route.name);
 const messgaeTypes = {
-  private: "私人消息",
-  teacher: "老师消息",
-  system: "系统通知",
-  my: "我的消息",
-  setting: "消息设置",
+  MessagePrivate: "私人消息",
+  MessageTeacher: "老师消息",
+  MessageSystem: "系统通知",
+  MessageMy: "我的消息",
+  MessageSetting: "消息设置",
 };
-const selectedMenu = ref("private");
+const selectedMenu = ref("MessagePrivate");
 const handleSelect = (index) => {
   selectedMenu.value = index;
-  router.push({ path: `/message/${selectedMenu.value}` });
+  router.push({ name: index });
 };
 onMounted(() => {
   document.body.style.overflow = "hidden";
+});
+watchEffect(() => {
+  activeMenu.value = route.name;
 });
 </script>
 
@@ -80,7 +86,8 @@ onMounted(() => {
           padding-left: 35px;
         }
         .el-menu-item.is-active {
-          color: #2faee3;
+          color: #5995fd;
+          background-color: #ecf5ff;
         }
       }
     }

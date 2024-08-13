@@ -21,6 +21,7 @@ const messages = ref([]);
 const getMessages = () => {
   let params = {
     uid: localStorage.getItem("user_uid"),
+    identity: localStorage.getItem("user_identity"),
   };
   MessageService.getSystemMessage(params)
     .then((res) => {

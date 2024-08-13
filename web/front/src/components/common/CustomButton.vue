@@ -1,6 +1,7 @@
 <template>
-  <el-button
+  <button
     class="btn"
+    :autocomplete="false"
     :type="type"
     :disabled="isLoading"
     :loading="isLoading"
@@ -8,21 +9,21 @@
       width: width + 'px',
       height: height + 'px',
       fontSize: fontSize + 'rem',
-      borderRadius: width + 'px',
+      borderRadius: isRadius ? width + 'px' : 'none',
     }"
   >
     <template v-if="isLoading">{{ loadingText }}</template>
     <template v-else>
-      <slot>{{ buttonText }}</slot>
+      {{ buttonText }}
     </template>
-  </el-button>
+  </button>
 </template>
 
 <script setup>
 const props = defineProps({
   type: {
     type: String,
-    default: "primary",
+    default: "button",
   },
   width: {
     type: Number,
@@ -48,6 +49,10 @@ const props = defineProps({
     type: String,
     default: "点击一下",
   },
+  isRadius: {
+    type: Boolean,
+    default: true,
+  },
 });
 </script>
 
@@ -57,7 +62,6 @@ const props = defineProps({
   border: none;
   outline: none;
   color: #fff;
-  text-transform: uppercase;
   font-weight: 600;
   margin: 10px auto;
   cursor: pointer;

@@ -20,3 +20,7 @@ export const size2Str = (limit) => {
   }
   return sizeStr;
 };
+export const jointAvatarUrl = (avatarUrl) => {
+  const VITE_STATIC_PATH = import.meta.env.VITE_STATIC_PATH;
+  return `${VITE_STATIC_PATH}${avatarUrl}`;
+};

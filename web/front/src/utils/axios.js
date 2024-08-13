@@ -5,7 +5,7 @@ import { ElMessage } from "element-plus"; // 引入el 提示框
 const textService = axios.create({
   baseURL: import.meta.env.VITE_API_POST,
   timeout: 5000, // 请求超时时间
-  withCredentials: true, //携带HttpOnly cookie
+  withCredentials: true, //携带HttpOnly cookie(包含用户的jwt令牌)
 });
 
 //http request 拦截器
@@ -53,6 +53,8 @@ export function request(url = "", params = {}, type = "") {
       case "PUT":
         promise = textService.put(url, params);
         break;
+      case "DELETE":
+        promise = textService.delete(url);
       default:
     }
     //处理返回

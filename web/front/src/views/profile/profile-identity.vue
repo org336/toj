@@ -7,6 +7,7 @@
       <el-col :span="20"
         ><el-form
           ref="identityRef"
+          label-width="100px"
           :model="identityForm"
           :rules="identityRules"
           class="row-middle"
@@ -38,27 +39,31 @@
               <img v-if="identityForm.imageUrl" :src="identityForm.imageUrl" class="image" />
               <i v-else class="fa-regular fa-image image"></i>
             </el-upload>
-            <CustomButton
-              :width="120"
-              :height="45"
-              :isLoading="loadingList.identityLoading"
-              buttonText="点击提交"
-              loadingText="提交中"
-              @click="submitForm"
-            ></CustomButton>
           </el-form-item>
+          <span class="el-upload__tip">只能上传jpg/jpeg/png文件，且不超过2MB</span>
         </el-form>
         <el-form-item></el-form-item
       ></el-col>
     </el-row>
     <el-row class="row-bottom">
-      <el-col :span="10"> </el-col>
+      <el-col :span="8" :offset="4"
+        ><CustomButton
+          :width="120"
+          :height="45"
+          :isLoading="loadingList.identityLoading"
+          buttonText="点击提交"
+          loadingText="提交中"
+          @click="submitForm"
+        ></CustomButton>
+      </el-col>
     </el-row>
   </div>
 </template>
 
 <script setup>
 import { ElMessage } from "element-plus";
+import { UploadService } from "@/utils/api";
+import { myLocalStorage } from "@/utils/storage";
 import { ref, reactive, getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
 const loadingList = reactive({
@@ -66,13 +71,7 @@ const loadingList = reactive({
 });
 const uploadRef = ref();
 const identityRef = ref();
-const identityForm = reactive({
-  realName: "",
-  userId: "",
-  identity: "",
-  imageUrl: "",
-  file: null,
-});
+const identityForm = reactive({});
 const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 const identityRules = {
   realName: [{ required: true, message: "请输入真实姓名" }],
@@ -114,19 +113,24 @@ const submitForm = () => {
   identityRef.value.validate((valid) => {
     if (valid) {
       // 处理认证信息上传逻辑
-      console.log(JSON.stringify(identityForm));
-      ElMessage({
-        showClose: true,
-        message: "上传信息成功",
-        type: "success",
-        center: true,
-      });
-    } else {
-      ElMessage({
-        showClose: true,
-        message: "请填写完整信息",
-        type: "warning",
-        center: true,
+      let params = {};
+      Object.assign(params, identityForm);
+      UploadService.uploadIdentity(myLocalStorage.get("user_uid"), params).then((res) => {
+        if (res.code === 200) {
+          ElMessage({
+            showClose: true,
+            message: "上传信息成功",
+            type: "success",
+            center: true,
+          });
+        } else {
+          ElMessage({
+            showClose: true,
+            message: "上传信息失败",
+            type: "error",
+            center: true,
+          });
+        }
       });
     }
   });
@@ -158,9 +162,8 @@ const submitForm = () => {
         }
       }
     }
-    .picker-container {
-      display: flex;
-      justify-content: space-between;
+    .el-upload__tip {
+      margin-left: 78px;
     }
     .image {
       text-align: center;

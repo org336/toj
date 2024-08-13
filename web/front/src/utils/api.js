@@ -26,7 +26,10 @@ export class UserService {
     return request("/users/profile", params, "POST");
   }
   static async sendEmailCode(params) {
-    return request("/users/email", params, "POST");
+    return request("/email/verify-code", params, "POST");
+  }
+  static async sendWelcomeEmail(params) {
+    return request("/email/welcome", params, "POST");
   }
 }
 /**
@@ -36,28 +39,38 @@ export class UploadService {
   static async uploadAvatar(uid, params) {
     return uploadFile(`/uploader/avatar?uid=${uid}`, params, "POST");
   }
+  static async uploadIdentity(uid, params) {
+    return request(`/uploader/authentication?uid=${uid}`, params, "POST");
+  }
 }
 /**
  * @description -封装Message类型的接口方法
  */
 export class MessageService {
   static async getSystemMessage(params) {
-    return request(`/messages/system/?uid=${params.uid}`, {}, "GET");
+    return request(
+      `/messages/system/?uid=${params.uid}&identity=${params.identity}`,
+      {},
+      "GET"
+    );
   }
-  static async createSystemMessage(params) {
-    return request("/messages/system", params, "POST");
+  static async createSystemMessage(face, uid, params) {
+    return request(`/messages/system?face=${face}&uid=${uid}`, params, "POST");
   }
   static async updateStausSystem(params) {
     return request("/messages/system/status", params, "POST");
   }
-  static async getPrivateMessage(params) {
-    return request(`/messages/private/?uid=${params.uid}`, {}, "GET");
+  static async getAllPrivateMessage(params) {
+    return request(`/messages/private/?&uid=${params}`, {}, "GET");
   }
   static async createPrivateMessage(params) {
     return request("/messages/private", params, "POST");
   }
   static async updateStausPrivate(params) {
     return request("/messages/private/status", params, "POST");
+  }
+  static async deletePrivateMessage(params) {
+    return request(`/messages/private?id=${params}`, {}, "DELETE");
   }
 }
 /**
@@ -69,5 +82,34 @@ export class CourseService {
   }
   static async getCourses(params) {
     return request("/courses", params, "GET");
+  }
+}
+/**
+ * @description -封装Class类型的接口方法
+ */
+export class ClassService {
+  static async addClass(params) {
+    return request("/classes", params, "POST");
+  }
+  static async getAllClasses() {
+    return request("/classes", {}, "GET");
+  }
+  static async getManyByClass(id) {
+    return request(`/classes/${id}/all`, {}, "GET");
+  }
+  static async addStudentsToClass(id, params) {
+    return request(`/classes/${id}`, params, "POST");
+  }
+  static async updateClass(id, params) {
+    return request(`/classes/${id}`, params, "PUT");
+  }
+  static async deleteClass(id) {
+    return request(`/classes/${id}`, {}, "DELETE");
+  }
+  static async deleteStudent(id, uid) {
+    return request(`/classes/${id}/${uid}`, {}, "DELETE");
+  }
+  static async getClass(id) {
+    return request(`/classes/${id}`, {}, "GET");
   }
 }

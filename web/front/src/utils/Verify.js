@@ -37,6 +37,13 @@ const resetPassword = (rule, value, callback, password) => {
     callback();
   }
 };
+const total = (rule, value, callback) => {
+  if (value < 0 || total > 255) {
+    callback(new Error("人数必须大于0，小于255"));
+  } else {
+    callback();
+  }
+};
 export default {
   email: (rule, value, callback) => {
     return verify(rule, value, regs.email, callback);
@@ -55,5 +62,8 @@ export default {
   },
   resetPassword: (rule, value, callback, passwordRef) => {
     return resetPassword(rule, value, callback, passwordRef);
+  },
+  email: (rule, value, callback) => {
+    return verify(rule, value, regs.total, callback);
   },
 };

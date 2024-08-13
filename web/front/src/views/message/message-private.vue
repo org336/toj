@@ -1,12 +1,14 @@
 <template>
   <div class="personal">
-    <div class="card" v-for="(item, index) in privateMessages">
+    <div class="card" v-for="(item, itemIndex) in privateMessages">
       <div class="sender">
-        <el-avatar :src="item.avatarUrl" shape="circle">{{ item.sender.nickName }}</el-avatar>
+        <el-avatar :src="jointAvatarUrl(item.sender.avatarUrl)" shape="circle">
+          <template>{{ item.sender.nickName }}</template>
+        </el-avatar>
         <span class="name">{{ item.sender.nickName }}</span>
         <span class="desc">私信了我</span>
       </div>
-      <div class="message" v-for="(message, index) in item.messages">
+      <div class="message" v-for="(message, messageIndex) in item.messages" :key="message.id">
         <div class="top">
           <span class="title">{{ message.title }}</span>
           <span class="content">{{ message.content }}</span>
@@ -29,7 +31,7 @@
               cancel-button-type="primary"
               icon-color="#2faee3"
               title="你确定要删除此条消息吗？"
-              @confirm="deleteMessage(message)"
+              @confirm="deleteMessage(item, message, messageIndex)"
             >
               <template #reference> <i class="fas fa-trash">删除</i> </template>
             </el-popconfirm>
@@ -44,7 +46,7 @@
           <div class="center-box">
             <el-input
               type="textarea"
-              v-model="item.reply"
+              v-model.trim="item.reply"
               placeholder="请输入回复"
               :autosize="{ minRows: 2, maxRows: 6 }"
             ></el-input>
@@ -53,7 +55,7 @@
             <el-button
               type="primary"
               :style="{ width: '52px', height: '52px' }"
-              @click="replyMessage(message)"
+              @click="replyMessage(item, message)"
               >点击
               <br />
               回复</el-button
@@ -71,14 +73,13 @@ import { useUserStore } from "@/store/user";
 import { MessageService } from "@/utils/api";
 import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
+import { jointAvatarUrl } from "@/utils/tools";
 const store = useUserStore();
 const { profile } = storeToRefs(store);
 const privateMessages = ref([]);
-const getMessages = () => {
-  let params = {
-    uid: localStorage.getItem("user_uid"),
-  };
-  MessageService.getPrivateMessage(params)
+const getPrivateMessages = () => {
+  let uid = localStorage.getItem("user_uid");
+  MessageService.getAllPrivateMessage(uid)
     .then((res) => {
       if (res.code == 200) {
         privateMessages.value = res.data;
@@ -88,19 +89,52 @@ const getMessages = () => {
       ElMessage.error("获取私人消息失败");
     });
 };
-const showReply = (item) => {
-  if (item.showReply == null) {
-    item.showReply = true;
+const showReply = (message) => {
+  if (message.showReply == null) {
+    message.showReply = true;
   } else {
-    item.showReply = !item.showReply;
+    message.showReply = !message.showReply;
   }
-  item.reply = null;
+  message.reply = null;
 };
-const replyMessage = () => {};
+const replyMessage = (item, message) => {
+  if (item.reply === undefined || item.reply === null || item.reply === "") {
+    ElMessage.success("请输入消息内容");
+    return;
+  }
+  let params = {
+    sender_uid: localStorage.getItem("user_uid"),
+    receiver_uid: item.sender.uid,
+    type: 1,
+    title: "回复",
+    event: "reply",
+    content: item.reply,
+  };
+  MessageService.createPrivateMessage(params)
+    .then((res) => {
+      if (res.code == 200) {
+        ElMessage.success("回复成功");
+      } else {
+        ElMessage.info("回复失败");
+      }
+    })
+    .finally(() => {
+      showReply(message);
+    });
+};
 const likeMessage = () => {};
-const deleteMessage = () => {};
+const deleteMessage = (item, message, messageIndex) => {
+  let id = message.id;
+  MessageService.deletePrivateMessage(id).then((res) => {
+    if (res.code == 200) {
+      item.messages.splice(messageIndex, 1);
+    } else {
+      ElMessage.error("删除失败，请重新尝试");
+    }
+  });
+};
 onMounted(() => {
-  getMessages();
+  getPrivateMessages();
 });
 </script>
 

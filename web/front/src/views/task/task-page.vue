@@ -1,29 +1,61 @@
 <template>
-  <div class="page">
-    <el-container>
-      <el-header>
-        <h2>作业管理</h2>
-      </el-header>
-      <el-main>
-        <el-table :data="tasks" stripe>
-          <el-table-column prop="name" label="作业名称" width="250" />
-          <el-table-column prop="class" label="班级" width="150" />
-          <el-table-column prop="deadline" label="作答时间" width="300" />
-          <el-table-column prop="pending" label="待批" width="80" />
-          <el-table-column prop="submitted" label="已交" width="80" />
-          <el-table-column label="操作" width="120">
-            <template #default="scope">
-              <el-button @click="reviewTask(scope.row)" type="primary" icon="fas fa-edit">
-                批阅
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-main>
-    </el-container>
+  <div class="task">
+    <div class="left-part">
+      <el-menu default-active="/task" :router="true">
+        <el-menu-item index="/task">
+          <span>任务总览</span>
+        </el-menu-item>
+        <el-menu-item index="/task/dashboard">
+          <span>批阅作业</span>
+        </el-menu-item>
+        <el-menu-item index="/task/create">
+          <span>布置作业</span>
+        </el-menu-item>
+        <el-menu-item index="/task/setting">
+          <span>任务设置</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
+    <div class="right-part">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+</script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.task {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 0 auto;
+  margin-top: 78px;
+  .left-part {
+    flex: 0;
+    height: 228px;
+    border: 2px solid rgb(32, 33, 36);
+    .el-menu-item {
+      font-size: 1.15rem;
+      font-weight: bold;
+    }
+    .el-menu-item.is-active {
+      background-color: #1565c0;
+      color: #fff;
+    }
+  }
+  .right-part {
+    flex: 1;
+    border: 2px solid rgb(32, 33, 36);
+    width: 100%;
+    padding: 12px;
+    max-height: calc(100vh - 78px);
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+</style>
