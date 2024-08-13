@@ -56,3 +56,4 @@ ehthumbs.db
 # 忽略 src/public/目录下的所有文件
 src/public/avatars/*
 src/public/identities/*
+src/public/courses/*

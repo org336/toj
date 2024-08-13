@@ -1,21 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Transaction } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BcryptUtils } from '~/utils/encrypt.util';
 import { v4 as uuid } from 'uuid';
 import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
-import { CommonService } from '~/common/common.service';
-import { ProfileDto } from './profile.dto';
+import { ProfileDto } from './user.dto';
 
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly emailService: EmailService,
-    private readonly commonService: CommonService,
   ) {}
 
   async findOneByEmail(email: string) {
@@ -23,11 +21,7 @@ export class UserService {
       where: { email },
     });
     if (!user)
-      throw new ApiException(
-        '用户不存在，请先去注册',
-        ApiCode.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new ApiException('用户不存在，请先去注册', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
     return user;
   }
   async findOneByUid(uid: string) {
@@ -35,11 +29,7 @@ export class UserService {
       where: { uid },
     });
     if (!user)
-      throw new ApiException(
-        '用户不存在，请先去注册',
-        ApiCode.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new ApiException('用户不存在，请先去注册', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
     return user;
   }
   async updateAvatarUrl(uid: string, avatarUrl: string) {
@@ -64,11 +54,7 @@ export class UserService {
     });
 
     if (existinguser) {
-      throw new ApiException(
-        '邮箱已被使用',
-        ApiCode.PARAMS_ERROR,
-        HttpStatus.CONFLICT,
-      );
+      throw new ApiException('邮箱已被使用', ApiCode.PARAMS_ERROR, HttpStatus.CONFLICT);
     }
     let emailKey = `emailCode:register:${user.email}`;
     await this.emailService.verifyEmailCode(emailKey, user.emailCode);
@@ -100,11 +86,7 @@ export class UserService {
   }): Promise<void> {
     const user = await this.findOneByUid(data.uid);
     if (!BcryptUtils.comparePassword(data.oldPassword, user.password)) {
-      throw new ApiException(
-        '原始密码错误',
-        ApiCode.PARAMS_ERROR,
-        HttpStatus.CONFLICT,
-      );
+      throw new ApiException('原始密码错误', ApiCode.PARAMS_ERROR, HttpStatus.CONFLICT);
     }
     user.password = await BcryptUtils.hashPassword(data.newPassword);
     await this.userRepository.save(user);
@@ -134,11 +116,7 @@ export class UserService {
       const updateResult = await this.userRepository.save(user);
       return new ProfileDto(updateResult);
     } catch (error) {
-      throw new ApiException(
-        '更新用户资料失败',
-        ApiCode.PARAMS_ERROR,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new ApiException('更新用户资料失败', ApiCode.PARAMS_ERROR, HttpStatus.BAD_REQUEST);
     }
   }
 }

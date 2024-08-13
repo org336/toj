@@ -15,6 +15,8 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { AxiosModule } from './shared/axios/axios.module';
 import { UploaderModule } from './modules/uploader/uploader.module';
 import { SocketModule } from './modules/socket/socket.module';
+import { ClassModule } from './modules/class/class.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +26,7 @@ import { SocketModule } from './modules/socket/socket.module';
     }),
     UserModule,
     MessageModule,
+    ClassModule,
     SocketModule,
     AxiosModule,
     CommonModule,

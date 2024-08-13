@@ -16,47 +16,25 @@ export class UploaderService {
     private readonly authenticationRepository: Repository<AuthenticationEntity>,
     private readonly userService: UserService,
   ) {}
-  private readonly avatarPath = path.join(
-    __dirname,
-    '..',
-    '..',
-    'public',
-    'avatars',
-  );
-  private readonly identityPath = path.join(
-    __dirname,
-    '..',
-    '..',
-    'public',
-    'identities',
-  );
+  private readonly avatarPath = path.join(__dirname, '..', '..', 'public', 'avatars');
+  private readonly identityPath = path.join(__dirname, '..', '..', 'public', 'identities');
   private readonly avatarLength = 24;
   private readonly identityLength = 24;
   async uploadAvatar(file: Express.Multer.File, uid: string): Promise<any> {
     if (!file) {
-      throw new ApiException(
-        '文件为空，请重新上传',
-        ApiCode.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new ApiException('文件为空，请重新上传', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     //检查文件夹是否存在
     if (!fs.existsSync(this.avatarPath)) {
       fs.mkdirSync(this.avatarPath, { recursive: true });
     }
     const fileExtension = file.originalname.split('.').pop();
-    const fileName = RandomUtil.generateRandomFileName(
-      this.avatarLength,
-      fileExtension,
-    );
+    const fileName = RandomUtil.generateRandomFileName(this.avatarLength, fileExtension);
     const filePath = path.join(this.avatarPath, fileName);
     try {
       await fs.promises.writeFile(filePath, file.buffer);
       // 更新用户头像URL，返回旧的URL，删除原来的资源
-      const oldAvatarUrl = await this.userService.updateAvatarUrl(
-        uid,
-        fileName,
-      );
+      const oldAvatarUrl = await this.userService.updateAvatarUrl(uid, fileName);
 
       if (oldAvatarUrl) {
         // 拼接完整的服务器路径
@@ -84,11 +62,7 @@ export class UploaderService {
     //匹配base64的前缀文件类型data:image/xxx;base64
     const matches = data.imageUrl.match(/^data:image\/(\w+);base64,/);
     if (!matches) {
-      throw new ApiException(
-        '无效的图片数据',
-        ApiCode.PARAMS_ERROR,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new ApiException('无效的图片数据', ApiCode.PARAMS_ERROR, HttpStatus.BAD_REQUEST);
     }
     // 将图片从 Base64 解码
     const base64Data = data.imageUrl.replace(/^data:image\/\w+;base64,/, '');
@@ -98,10 +72,7 @@ export class UploaderService {
       fs.mkdirSync(this.identityPath, { recursive: true });
     }
     const fileExtension = matches[1];
-    const fileName = RandomUtil.generateRandomFileName(
-      this.identityLength,
-      fileExtension,
-    );
+    const fileName = RandomUtil.generateRandomFileName(this.identityLength, fileExtension);
     const filePath = path.join(this.identityPath, fileName);
     let identityMapping = {
       student: 1,
@@ -109,12 +80,13 @@ export class UploaderService {
     };
     try {
       await fs.promises.writeFile(filePath, imgBuffer);
-      const authentication = new AuthenticationEntity();
-      authentication.uid = uid;
-      authentication.userId = data.userId;
-      authentication.realName = data.realName;
-      authentication.identity = identityMapping[data.identity];
-      authentication.imgUrl = fileName;
+      const authentication = this.authenticationRepository.create({
+        uid: uid,
+        userId: data.userId,
+        realName: data.realName,
+        identity: identityMapping[data.identity],
+        imgUrl: fileName,
+      });
       await this.authenticationRepository.save(authentication);
     } catch (error) {
       throw new ApiException(

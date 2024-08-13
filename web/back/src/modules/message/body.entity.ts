@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 
 @Entity('message_body')
 export class BodyEntity {
@@ -46,10 +46,10 @@ export class BodyEntity {
 export class BodySystemEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
+  @Column({ type: 'int', nullable: true })
+  msg_id: number;
   @Column({ type: 'varchar', length: 36, nullable: true, comment: '接收者UID' })
   user_uid: string;
-
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -65,6 +65,12 @@ export class BodySystemEntity {
     comment: '操作更新时间',
   })
   update_time: Date;
+  @Column({
+    type: 'tinyint',
+    nullable: true,
+    comment: '0表示面向个人用户，1表示面向所有学生，2表示面向所有老师，4表示面向全体用户',
+  })
+  face: number;
 }
 @Entity('message_body_private')
 export class BodyPrivateEntity {

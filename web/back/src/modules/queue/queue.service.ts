@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Mail } from '~/constants/interface/common.interface';
 import { Queue } from 'bull';
-import { log } from 'console';
 
 @Injectable()
 export class QueueService {

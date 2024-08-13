@@ -33,7 +33,7 @@ export class UserEntity {
 
   @Column({
     type: 'tinyint',
-    comment: '0表示为游客，1表示为学生，2表示为管老师,5表示为管理员',
+    comment: '0表示为普通用户，1表示为学生，2表示为老师,5表示为管理员',
   })
   identity: number;
 
