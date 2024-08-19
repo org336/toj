@@ -31,6 +31,9 @@ export class UserService {
   static async sendWelcomeEmail(params) {
     return request("/email/welcome", params, "POST");
   }
+  static async getAllStudents() {
+    return request("/users/all?identity=1", {}, "GET");
+  }
 }
 /**
  * @description -封装Upload类型的接口方法
@@ -98,7 +101,10 @@ export class ClassService {
     return request(`/classes/${id}/all`, {}, "GET");
   }
   static async addStudentsToClass(id, params) {
-    return request(`/classes/${id}`, params, "POST");
+    return request(`/classes/${id}/all`, params, "POST");
+  }
+  static async removeStudentsFromClass(id, params) {
+    return request(`/classes/${id}/all`, params, "DELETE");
   }
   static async updateClass(id, params) {
     return request(`/classes/${id}`, params, "PUT");

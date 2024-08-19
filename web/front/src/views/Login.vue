@@ -146,7 +146,7 @@
               <i class="fas fa-envelope"></i>
               <el-form-item prop="emailCode">
                 <el-input
-                  type="number"
+                  type="text"
                   v-model.trim="signUpForm.emailCode"
                   placeholder="验证码"
                 />
@@ -163,7 +163,7 @@
             <i class="fa-solid fa-id-card"></i>
             <el-form-item prop="userId">
               <el-input
-                type="number"
+                type="text"
                 v-model.trim="signUpForm.userId"
                 clearable
                 placeholder="学工号"

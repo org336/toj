@@ -54,7 +54,7 @@ export function request(url = "", params = {}, type = "") {
         promise = textService.put(url, params);
         break;
       case "DELETE":
-        promise = textService.delete(url);
+        promise = textService.delete(url, { data: params });
       default:
     }
     //处理返回

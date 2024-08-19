@@ -3,7 +3,6 @@
     class="btn"
     :autocomplete="false"
     :type="type"
-    :disabled="isLoading"
     :loading="isLoading"
     :style="{
       width: width + 'px',
@@ -14,6 +13,7 @@
   >
     <template v-if="isLoading">{{ loadingText }}</template>
     <template v-else>
+      <slot name="icon"></slot>
       {{ buttonText }}
     </template>
   </button>
@@ -47,7 +47,7 @@ const props = defineProps({
   },
   buttonText: {
     type: String,
-    default: "点击一下",
+    default: "",
   },
   isRadius: {
     type: Boolean,
