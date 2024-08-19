@@ -7,6 +7,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { EmailService } from '~/shared/mailer/email.service';
@@ -22,19 +23,6 @@ export class UserController {
     private readonly emailService: EmailService,
   ) {}
 
-  // 注册新用户
-  @ApiBody({
-    description: '用户注册提交的信息',
-    type: 'object',
-    schema: {
-      properties: {
-        email: { type: 'string', example: '2959346375@qq.com' },
-        emailCode: { type: 'string', example: '123456' },
-        userId: { type: 'string', example: '1520223609' },
-        password: { type: 'string', example: 'test123456!' },
-      },
-    },
-  })
   @Public()
   @Post('member')
   async register(
@@ -48,18 +36,6 @@ export class UserController {
   ) {
     return await this.userService.register(user);
   }
-  // 修改用户密码
-  @ApiBody({
-    description: '重置密码样例',
-    type: 'object',
-    schema: {
-      properties: {
-        email: { type: 'string', example: '2959346375@qq.com' },
-        emailCode: { type: 'string', example: '123456' },
-        newPassword: { type: 'string', example: 'test123456~' },
-      },
-    },
-  })
   @Public()
   @Put('password-reset')
   async changePassword(
@@ -67,106 +43,31 @@ export class UserController {
   ) {
     return await this.userService.resetPassword(data);
   }
-  @ApiBody({
-    description: '更新密码样例',
-    type: 'object',
-    schema: {
-      properties: {
-        uid: { type: 'string', example: '' },
-        oldPassword: { type: 'string', example: 'test123456!' },
-        newPassword: { type: 'string', example: 'test123456~' },
-      },
-    },
-  })
+
   @Put('password-update')
   async updatePassword(
     @Body() data: { uid: string; oldPassword: string; newPassword: string },
   ) {
     return await this.userService.updatePassword(data);
   }
-  // 发送邮箱验证码
-  @ApiBody({
-    description: '发送邮箱验证码',
-    type: 'object',
-    schema: {
-      properties: {
-        email: { type: 'string', example: '2959346375@qq.com' },
-        purpose: { type: 'string', example: 'register/resetPwd' },
-      },
-    },
-  })
+
   @Public()
   @Post('email')
   async sendEmailCode(@Body() data: { email: string; purpose: string }) {
     return await this.emailService.sendEmailCode(data.email, data.purpose);
   }
-  @ApiBody({
-    description: '获取用户信息',
-    type: 'object',
-    schema: {
-      properties: {
-        uid: {
-          type: 'string',
-          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
-        },
-      },
-    },
-  })
-  @ApiBody({
-    description: '用户人机校验',
-    type: 'object',
-    schema: {
-      properties: {
-        token: { type: 'string', example: '' },
-      },
-    },
-  })
+
   @Public()
   @Post('recaptcha')
   async validate(@Body('token') token: string): Promise<boolean> {
     return await this.recaptchaService.validateToken(token);
   }
-  @ApiBody({
-    description: '获取用户信息',
-    type: 'object',
-    schema: {
-      properties: {
-        uid: {
-          type: 'string',
-          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
-        },
-      },
-    },
-  })
+
   @Post('profile')
   async getProfile(@Body() data: { uid: string }) {
     return await this.userService.getProfile(data.uid);
   }
-  @ApiBody({
-    description: '更新用户信息',
-    type: 'object',
-    schema: {
-      properties: {
-        uid: {
-          type: 'string',
-          example: '65278040-2d17-11ef-bcf8-41298d1831e7',
-        },
-        nickName: { type: 'string', example: '小炎子' },
-        realName: { type: 'string', example: '萧炎' },
-        userId: { type: 'string', example: '1520223609' },
-        email: { type: 'string', example: '2959346375@qq.com' },
-        signature: {
-          type: 'string',
-          example: '三十年河东，三十线河西，莫欺少年穷!!!',
-        },
-        identity: { type: 'number', example: 0 },
-        avatarUrl: {
-          type: 'string',
-          example: '',
-        },
-      },
-    },
-  })
+
   @Put('profile')
   async updateProfile(
     @Body()
@@ -181,5 +82,9 @@ export class UserController {
     },
   ) {
     return await this.userService.updateProfile(data);
+  }
+  @Get('all')
+  async getAllByIdentity(@Query('identity') identity: number) {
+    return await this.userService.findAllByIdentity(identity);
   }
 }

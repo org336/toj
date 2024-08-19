@@ -23,15 +23,15 @@ export class MessageController {
   ) {
     return await this.messageService.createSystemMessage(query, data);
   }
-
   @Post('system/status')
-  async updateStatusSystem(
+  async updateSystemAlreadyRead(
     @Body()
     data: {
       uid: string;
+      alreadyReadCount: number;
     },
   ) {
-    return await this.messageService.updateStatusSystem(data.uid);
+    return await this.messageService.updateSystemAlreadyRead(data);
   }
   @Get('private')
   async getAllPrivateMessages(@Query('uid') uid: string) {
@@ -57,7 +57,14 @@ export class MessageController {
     await this.messageService.deletePrivateMessage(id);
   }
   @Post('private/status')
-  async updateStatusPrivate(@Body() data: { sender_uid: string; recevier_uid: string }) {
-    return await this.messageService.updateStatusPrivate(data.sender_uid, data.recevier_uid);
+  async updateStatusPrivate(
+    @Body()
+    data: {
+      sender_uid: string;
+      recevier_uid: string;
+      alreadyReadCount: number;
+    },
+  ) {
+    return await this.messageService.updatePrivateAlreadyRead(data);
   }
 }

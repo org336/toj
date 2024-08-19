@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BcryptUtils } from '~/utils/encrypt.util';
 import { v4 as uuid } from 'uuid';
@@ -8,29 +8,47 @@ import { ApiCode } from '~/constants/enums/api-code.enums';
 import { ApiException } from '~/constants/exception/api.exception';
 import { EmailService } from '~/shared/mailer/email.service';
 import { ProfileDto } from './user.dto';
+import { MessageService } from '../message/message.service';
 
 export class UserService {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly emailService: EmailService,
+    private readonly messageService: MessageService,
   ) {}
 
   async findOneByEmail(email: string) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .select()
+      .where('email=:email', { email })
+      .getOne();
     if (!user)
       throw new ApiException('用户不存在，请先去注册', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
     return user;
   }
   async findOneByUid(uid: string) {
-    const user = await this.userRepository.findOne({
-      where: { uid },
-    });
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .select()
+      .where('uid=:uid', { uid })
+      .getOne();
     if (!user)
       throw new ApiException('用户不存在，请先去注册', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
     return user;
+  }
+  async findAllByIdentity(identity: number) {
+    const result = await this.userRepository
+      .createQueryBuilder()
+      .select(['uid', 'user_id', 'email', 'real_name'])
+      .where('identity=:identity', { identity })
+      .getRawMany();
+    if (!result) {
+      throw new ApiException('未找到身份为学生的用户', ApiCode.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+    return result;
   }
   async updateAvatarUrl(uid: string, avatarUrl: string) {
     const user = await this.findOneByUid(uid);
@@ -39,7 +57,7 @@ export class UserService {
       .createQueryBuilder()
       .update()
       .set({ avatarUrl: avatarUrl })
-      .where('uid = :uid', { uid: uid })
+      .where('uid = :uid', { uid })
       .execute();
     return oldAvatarUrl;
   }
@@ -49,21 +67,36 @@ export class UserService {
     userId: string;
     password: string;
   }): Promise<{ uid: string; email: string }> {
-    const existinguser = await this.userRepository.findOne({
-      where: { email: user.email },
-    });
+    const { email, emailCode, userId, password } = user;
+    const isExisting = await this.userRepository
+      .createQueryBuilder()
+      .where('email=:email', { email })
+      .getOne();
 
-    if (existinguser) {
+    if (isExisting) {
       throw new ApiException('邮箱已被使用', ApiCode.PARAMS_ERROR, HttpStatus.CONFLICT);
     }
-    let emailKey = `emailCode:register:${user.email}`;
-    await this.emailService.verifyEmailCode(emailKey, user.emailCode);
+    let emailKey = `emailCode:register:${email}`;
+    await this.emailService.verifyEmailCode(emailKey, emailCode);
     const uid = uuid();
-    user.password = await BcryptUtils.hashPassword(user.password);
-    //默认为普通游客
-    const newuser = this.userRepository.create({ ...user, uid, identity: 0 });
-    await this.userRepository.save(newuser);
-    return { uid, email: user.email };
+    const hashPassword = await BcryptUtils.hashPassword(password);
+    //事务管理
+    await this.dataSource.transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into(UserEntity)
+        .values({
+          uid,
+          email,
+          userId,
+          password: hashPassword,
+          identity: 0,
+        })
+        .execute();
+      await this.messageService.createStatusSystem(uid);
+    });
+    return { uid, email };
   }
 
   async resetPassword(data: {

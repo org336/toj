@@ -26,15 +26,21 @@ export class ClassController {
   async getManyByClass(@Param('id') id: string): Promise<any> {
     return await this.classService.getStudentsByClass(id);
   }
-  @Post(':id')
+  @Post(':id/all')
   async addManyToClass(
     @Param('id') class_id: string,
     @Body()
-    data: {
-      user_uids: Array<string>;
-    },
+    data: Array<string>,
   ): Promise<any> {
     return await this.classService.addManyToClass(class_id, data);
+  }
+  @Delete(':id/all')
+  async removeManyFromClass(
+    @Param('id') class_id: string,
+    @Body()
+    data: Array<string>,
+  ): Promise<any> {
+    return await this.classService.removeManyFromClass(class_id, data);
   }
   @Put(':id')
   async updateClass(
@@ -56,8 +62,8 @@ export class ClassController {
   async deleteClass(@Param('id') id: string): Promise<void> {
     return await this.classService.deleteClass(id);
   }
-  @Delete(':id/:user_uid')
-  async deleteStudent(@Param('id') id: string, @Param('user_uid') uid: string): Promise<void> {
+  @Delete(':id/:uid')
+  async deleteStudent(@Param('id') id: string, @Param('uid') uid: string): Promise<void> {
     return await this.classService.deleteStudent(id, uid);
   }
 }

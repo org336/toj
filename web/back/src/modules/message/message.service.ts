@@ -38,73 +38,119 @@ export class MessageService {
     });
     return messages;
   }
+  async createStatusPrivate(sender_uid: string, receiver_uid: string): Promise<any> {}
+  async createStatusSystem(uid: string): Promise<any> {
+    const result = await this.statusSystemRepository
+      .createQueryBuilder()
+      .insert()
+      .into(StatusSystemEntity)
+      .values({
+        user_uid: uid,
+      })
+      .execute();
+    if (!result || result.raw.affectedRows === 0) {
+      throw new ApiException('插入系统消息状态失败', ApiCode.BUSINESS_ERROR, 400);
+    }
+  }
   async createSystemMessage(query: any, data: any): Promise<void> {
     const { face, uid } = query;
     const { event, type, title, content } = data;
+
     // 创建一个新的消息实体
     return await this.dataSource.transaction(async (transactionalEntityManager) => {
-      const message = await transactionalEntityManager.save(
-        this.bodyRepository.create({
+      const message = await transactionalEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into(BodyEntity)
+        .values({
           event,
           type,
           title,
           content,
-        }),
-      );
-      if (!message || !message.id) {
+        })
+        .execute();
+      if (!message.identifiers.length) {
         throw new ApiException('系统消息创建失败', ApiCode.BUSINESS_ERROR, 400);
       }
-      const result = await transactionalEntityManager.save(
-        this.bodySystemRepository.create({
-          msg_id: message.id,
+      const result = await transactionalEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into(BodySystemEntity)
+        .values({
+          msg_id: message.identifiers[0].id,
           user_uid: uid,
           face: face,
-        }),
-      );
+        })
+        .execute();
       // 检查系统消息关系是否成功创建
-      if (!result) {
+      if (!result.identifiers.length) {
         throw new ApiException('系统消息关系创建失败', ApiCode.BUSINESS_ERROR, 400);
       }
     });
   }
-  async updateStatusSystem(uid: string): Promise<any> {
-    let statusSystemRecord = await this.statusSystemRepository.findOne({
-      where: { user_uid: uid },
-    });
-    const currentTime = new Date();
-    if (!statusSystemRecord) {
-      statusSystemRecord = this.statusSystemRepository.create({
-        user_uid: uid,
-        last_read_time: currentTime,
-      });
-      await this.statusSystemRepository.save(statusSystemRecord);
-    } else {
-      await this.statusSystemRepository.update(
-        { id: statusSystemRecord.id },
-        { last_read_time: currentTime },
-      );
-    }
-  }
-  async updateStatusPrivate(sender_uid: string, receiver_uid: string): Promise<any> {
-    let statusPrivateRecord = await this.statusPrivateRepository.findOne({
-      where: { sender_uid, receiver_uid },
-    });
-    const currentTime = new Date();
-    if (!statusPrivateRecord) {
-      statusPrivateRecord = this.statusPrivateRepository.create({
+  async updatePrivateAlreadyRead(data: {
+    sender_uid: string;
+    recevier_uid: string;
+    alreadyReadCount: number;
+  }): Promise<any> {
+    const { sender_uid, recevier_uid, alreadyReadCount } = data;
+    const result = await this.statusPrivateRepository
+      .createQueryBuilder()
+      .update(StatusPrivateEntity)
+      .set({ already_read: alreadyReadCount })
+      .where('sender_uid = :sender_uid AND receiver_uid = :recevier_uid', {
         sender_uid,
-        receiver_uid,
-        last_read_time: currentTime,
-      });
-      await this.statusPrivateRepository.save(statusPrivateRecord);
-    } else {
-      statusPrivateRecord.last_read_time = currentTime;
-      await this.statusPrivateRepository.update(
-        { id: statusPrivateRecord.id },
-        { last_read_time: currentTime },
-      );
+        recevier_uid,
+      })
+      .execute();
+    if (!result.affected) {
+      throw new ApiException('更新私人消息状态失败', ApiCode.BUSINESS_ERROR, 400);
     }
   }
+  async updatePrivateTotalCount(data: {
+    sender_uid: string;
+    recevier_uid: string;
+    totalCount: number;
+  }): Promise<any> {
+    const { sender_uid, recevier_uid, totalCount } = data;
+    const result = await this.statusPrivateRepository
+      .createQueryBuilder()
+      .update(StatusPrivateEntity)
+      .set({ total: totalCount })
+      .where('sender_uid = :sender_uid AND receiver_uid = :recevier_uid', {
+        sender_uid,
+        recevier_uid,
+      })
+      .execute();
+    if (!result.affected) {
+      throw new ApiException('更新私人消息状态失败', ApiCode.BUSINESS_ERROR, 400);
+    }
+  }
+  async updateSystemAlreadyRead(data: { uid: string; alreadyReadCount: number }): Promise<any> {
+    const { uid, alreadyReadCount } = data;
+    const result = await this.statusSystemRepository
+      .createQueryBuilder()
+      .update(StatusSystemEntity)
+      .set({ already_read: alreadyReadCount })
+      .where('user_uid = :uid', { uid })
+      .execute();
+    if (!result.affected) {
+      throw new ApiException('更新私人消息状态失败', ApiCode.BUSINESS_ERROR, 400);
+    }
+  }
+  async updateSystemTotalCount(data: { uid: string; totalCount: number }): Promise<any> {
+    const { uid, totalCount } = data;
+    const result = await this.statusSystemRepository
+      .createQueryBuilder()
+      .update(StatusSystemEntity)
+      .set({ total: totalCount })
+      .where('user_uid = :uid', { uid })
+      .execute();
+    if (!result.affected) {
+      throw new ApiException('更新私人消息状态失败', ApiCode.BUSINESS_ERROR, 400);
+    }
+  }
+
   async getPrivateMessage(sender_uid: string, receiver_uid: string): Promise<any> {
     // 先找出两个用户之间是否存在私人消息
     const query = await this.bodyPrivateRepository
@@ -117,7 +163,6 @@ export class MessageService {
       throw new ApiException('未找到双方的任何私人消息', ApiCode.BUSINESS_ERROR, 400);
     }
     const msgIds = query.map((record) => record.msg_id);
-
     const messages = await this.bodyRepository
       .createQueryBuilder()
       .whereInIds(msgIds)
@@ -147,16 +192,18 @@ export class MessageService {
     for (const item of queryResult) {
       const msgIds = item.msg_ids.split(',');
       // 找出当前用户的所有的私人消息以及发送人信息
-      const sender = await this.userRepository.findOne({
-        where: { uid: item.sender_uid },
-      });
-      const messages = await this.bodyRepository.find({
-        where: { id: In(msgIds) },
-        order: { update_time: 'DESC' },
-      });
-
+      const sender = await this.userRepository
+        .createQueryBuilder()
+        .select(['uid', 'nick_name', 'real_name', 'avatar_url'])
+        .where('uid = :uid', { uid: item.sender_uid })
+        .getRawOne();
+      const messages = await this.bodyRepository
+        .createQueryBuilder()
+        .where('id IN (:...msgIds)', { msgIds })
+        .orderBy('update_time', 'DESC')
+        .getMany();
       result.push({
-        sender: new SenderDto(sender),
+        sender: sender,
         messages: messages,
       });
     }
@@ -193,6 +240,7 @@ export class MessageService {
           receiver_uid,
         }),
       );
+
       // 检查私人消息关系是否成功创建
       if (!result) {
         throw new ApiException('私人消息关系创建失败', ApiCode.BUSINESS_ERROR, 400);

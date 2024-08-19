@@ -81,9 +81,9 @@ export class ClassService {
       throw new ApiException('更新班级信息失败', ApiCode.BUSINESS_ERROR, 400);
     }
   }
-  async addManyToClass(class_id: string, data: any): Promise<void> {
-    const { user_uids } = data;
-    const values = user_uids.map((user_uid) => ({ class_id, user_uid }));
+  // 为班级添加成员
+  async addManyToClass(class_id: string, data: Array<string>): Promise<void> {
+    const values = data.map((user_uid) => ({ class_id, user_uid }));
     const result = await this.classToUserRepository
       .createQueryBuilder()
       .insert()
@@ -91,6 +91,18 @@ export class ClassService {
       .execute();
     if (!result || result.raw.affectedRows === 0) {
       throw new ApiException('添加学生到班级失败', ApiCode.BUSINESS_ERROR, 400);
+    }
+  }
+  // 从班级中移除成员
+  async removeManyFromClass(class_id: string, data: any): Promise<void> {
+    const result = await this.classToUserRepository
+      .createQueryBuilder()
+      .delete()
+      .where('class_id = :class_id', { class_id })
+      .andWhere('user_uid IN (:...user_uids)', { user_uids: data })
+      .execute();
+    if (!result || result.affected === 0) {
+      throw new ApiException('从班级中移除学生失败', ApiCode.BUSINESS_ERROR, 400);
     }
   }
   // 删除班级
