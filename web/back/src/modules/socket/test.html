@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <script
+      src="https://cdn.socket.io/4.3.2/socket.io.min.js"
+      integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io('http://localhost:3036/chatroom');
+      socket.on('connect', function () {
+        console.log('Connected Successfully');
+        // 加入聊天室
+        socket.emit('joinChatRoom', {
+          uid1: 'e3d52140-3221-11ef-be6f-499d86323266',
+          uid2: '65278040-2d17-11ef-bcf8-41298d1831e7',
+        });
+        socket.emit('test', { test: 'test' });
+        socket.emit('send', {
+          sender_uid: 'e3d52140-3221-11ef-be6f-499d86323266',
+          receiver_uid: '65278040-2d17-11ef-bcf8-41298d1831e7',
+          event: 'talk',
+          type: 1,
+          title: 'Hello',
+          content: 'Hello, this is a private message',
+        });
+      });
+      socket.on('test', function (data) {
+        console.log('test', data);
+      });
+      socket.on('receive', function (data) {
+        console.log('receive', data);
+      });
+      socket.on('exception', function (data) {
+        console.log('event', data);
+      });
+      socket.on('disconnect', function () {
+        console.log('Disconnected');
+      });
+    </script>
+  </head>
+
+  <body></body>
+</html>
