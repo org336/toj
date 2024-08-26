@@ -1,4 +1,4 @@
-name: CI
+name: web-back CI
 
 on:
   push:
@@ -20,8 +20,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: 0wfXYvF8A52E~JY
           MYSQL_DATABASE: bluewhale
-          MYSQL_USER: root
-          MYSQL_PASSWORD: 0wfXYvF8A52E~JY
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
