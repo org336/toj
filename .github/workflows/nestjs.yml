@@ -18,7 +18,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: 0wfXYvF8A52E~JY
+          MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: bluewhale
         options: >-
           --health-cmd="mysqladmin ping --silent"
@@ -72,10 +72,10 @@ jobs:
 
       - name: Create .env.development file
         run: |
-          echo DB_HOST=localhost >> web/back/.env.development
+          echo DB_HOST=127.0.0.1 >> web/back/.env.development
           echo DB_PORT=3306 >> web/back/.env.development
           echo DB_USERNAME=root >> web/back/.env.development
-          echo DB_PASSWORD=0wfXYvF8A52E >> web/back/.env.development
+          echo DB_PASSWORD=123456 >> web/back/.env.development
           echo DB_DATABASE=bluewhale >> web/back/.env.development
           echo REDIS_PORT=6379 >> web/back/.env.development
           echo REDIS_HOST=127.0.0.1 >> web/back/.env.development
@@ -91,7 +91,7 @@ jobs:
           echo CLIENT_ORIGIN=http://localhost:3072 >> web/back/.env.development
           echo RECAPTCHA_SECRET=6LddetQpAAAAANsTF75DLlAN74MDtg7Ji8wuGI_q >> web/back/.env.development
       
-      - name: Run dev
+      - name: Dev  Project
         run: npm run start:dev
         working-directory: web/back/
 
