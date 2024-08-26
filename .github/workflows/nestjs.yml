@@ -53,6 +53,9 @@ jobs:
         run: npm install
         working-directory: web/back/
 
+      - name: Install Redis CLI
+        run: sudo apt-get update && sudo apt-get install -y redis-tools
+
       - name: Wait for MySQL to be ready
         run: |
           until mysqladmin ping -h 127.0.0.1 -u root -p0wfXYvF8A52E~JY --silent; do
@@ -62,7 +65,7 @@ jobs:
 
       - name: Wait for Redis to be ready
         run: |
-          until redis-cli ping; do
+          until redis-cli -h localhost -p 6379 ping; do
             echo 'Waiting for Redis...'
             sleep 5
           done
