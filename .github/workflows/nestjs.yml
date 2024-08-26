@@ -72,24 +72,24 @@ jobs:
 
       - name: Create .env.development file
         run: |
-          echo DB_HOST=localhost >> web/back/.env
-          echo DB_PORT=3306 >> web/back/.env
-          echo DB_USERNAME=root >> web/back/.env
-          echo DB_PASSWORD=0wfXYvF8A52E >> web/back/.env
-          echo DB_DATABASE=bluewhale >> web/back/.env
-          echo REDIS_PORT=6379 >> web/back/.env
-          echo REDIS_HOST=127.0.0.1 >> web/back/.env
-          echo REDIS_DB_1=1 >> web/back/.env
-          echo REDIS_DB_0=0 >> web/back/.env
-          echo SMTP_HOST=smtp.qq.com >> web/back/.env
-          echo SMTP_PORT=465 >> web/back/.env
-          echo SMTP_USER=2959346375@qq.com >> web/back/.env
-          echo SMTP_PASS=wwqrkmkriolpdccc >> web/back/.env
-          echo HTTP_TIMEOUT=5000 >> web/back/.env
-          echo HTTP_MAX_REDIRECTS=5 >> web/back/.env
-          echo JWT_SECRET=abcdef >> web/back/.env
-          echo CLIENT_ORIGIN=http://localhost:3072 >> web/back/.env
-          echo RECAPTCHA_SECRET=6LddetQpAAAAANsTF75DLlAN74MDtg7Ji8wuGI_q >> web/back/.env
+          echo DB_HOST=localhost >> web/back/.env.development
+          echo DB_PORT=3306 >> web/back/.env.development
+          echo DB_USERNAME=root >> web/back/.env.development
+          echo DB_PASSWORD=0wfXYvF8A52E >> web/back/.env.development
+          echo DB_DATABASE=bluewhale >> web/back/.env.development
+          echo REDIS_PORT=6379 >> web/back/.env.development
+          echo REDIS_HOST=127.0.0.1 >> web/back/.env.development
+          echo REDIS_DB_1=1 >> web/back/.env.development
+          echo REDIS_DB_0=0 >> web/back/.env.development
+          echo SMTP_HOST=smtp.qq.com >> web/back/.env.development
+          echo SMTP_PORT=465 >> web/back/.env.development
+          echo SMTP_USER=2959346375@qq.com >> web/back/.env.development
+          echo SMTP_PASS=wwqrkmkriolpdccc >> web/back/.env.development
+          echo HTTP_TIMEOUT=5000 >> web/back/.env.development
+          echo HTTP_MAX_REDIRECTS=5 >> web/back/.env.development
+          echo JWT_SECRET=abcdef >> web/back/.env.development
+          echo CLIENT_ORIGIN=http://localhost:3072 >> web/back/.env.development
+          echo RECAPTCHA_SECRET=6LddetQpAAAAANsTF75DLlAN74MDtg7Ji8wuGI_q >> web/back/.env.development
       
       - name: Run dev
         run: npm run start:dev
