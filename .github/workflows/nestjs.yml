@@ -11,7 +11,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+        DB_HOST: ${{ vars.DB_HOST }}
+        DB_PORT: ${{ vars.DB_PORT }}
+        DB_USERNAME: ${{ vars.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_DATABASE: ${{ vars.DB_DATABASE }}
+        DB_SYNCHRONIZE: ${{ vars.DB_SYNCHRONIZE }}
+        REDIS_PORT: ${{ vars.REDIS_PORT }}
+        REDIS_HOST: ${{ vars.REDIS_HOST }}
+        REDIS_DB_1: ${{ vars.REDIS_DB_1 }}
+        REDIS_DB_0: ${{ vars.REDIS_DB_0 }}
+        SMTP_HOST: ${{ vars.SMTP_HOST }}
+        SMTP_PORT: ${{ vars.SMTP_PORT }}
+        SMTP_USER: ${{ vars.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        HTTP_TIMEOUT: ${{ vars.HTTP_TIMEOUT }}
+        HTTP_MAX_REDIRECTS: ${{ vars.HTTP_MAX_REDIRECTS }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        CLIENT_ORIGIN: ${{ vars.CLIENT_ORIGIN }}
+        RECAPTCHA_SECRET: ${{ secrets.RECAPTCHA_SECRET }}
     services:
       mysql:
         image: mysql:8.0
@@ -58,7 +77,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h 127.0.0.1 -u root -p0wfXYvF8A52E~JY --silent; do
+          until mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} --silent; do
             echo 'Waiting for MySQL...'
             sleep 5
           done
@@ -85,7 +104,7 @@ jobs:
           echo SMTP_PORT=${{ vars.SMTP_PORT }} >> web/back/.env.development
           echo SMTP_USER=${{ vars.SMTP_USER }} >> web/back/.env.development
           echo SMTP_PASS=${{ secrets.SMTP_PASS }} >> web/back/.env.development
-          echo HTTP_TIMEOUT=${{ vars.HTTP_MAX_REDIRECTS }} >> web/back/.env.development
+          echo HTTP_TIMEOUT=${{ vars.HTTP_TIMEOUT  }} >> web/back/.env.development
           echo HTTP_MAX_REDIRECTS=${{ vars.HTTP_MAX_REDIRECTS }} >> web/back/.env.development
           echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> web/back/.env.development
           echo CLIENT_ORIGIN=${{ vars.CLIENT_ORIGIN }} >> web/back/.env.development
