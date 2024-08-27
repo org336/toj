@@ -18,8 +18,8 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: 123456
-          MYSQL_DATABASE: bluewhale
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ vars.DB_DATABASE }}
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -72,22 +72,24 @@ jobs:
 
       - name: Create .env.development file
         run: |
-          echo DB_HOST=127.0.0.1 >> web/back/.env.development
-          echo DB_PORT=3306 >> web/back/.env.development
-          echo DB_USERNAME=root >> web/back/.env.development
-          echo DB_PASSWORD=123456 >> web/back/.env.development
-          echo DB_DATABASE=bluewhale >> web/back/.env.development
-          echo REDIS_PORT=6379 >> web/back/.env.development
-          echo REDIS_HOST=127.0.0.1 >> web/back/.env.development
-          echo REDIS_DB_1=1 >> web/back/.env.development
-          echo REDIS_DB_0=0 >> web/back/.env.development
-          echo SMTP_HOST=smtp.qq.com >> web/back/.env.development
-          echo SMTP_PORT=465 >> web/back/.env.development
-          echo HTTP_TIMEOUT=5000 >> web/back/.env.development
-          echo HTTP_MAX_REDIRECTS=5 >> web/back/.env.development
-          echo JWT_SECRET=abcdef >> web/back/.env.development
-          echo CLIENT_ORIGIN=http://localhost:3072 >> web/back/.env.development
-         
+          echo DB_HOST=${{ vars.DB_HOST }} >> web/back/.env.development
+          echo DB_PORT=${{ vars.DB_PORT }} >> web/back/.env.development
+          echo DB_USERNAME=${{ vars.DB_USERNAME }} >> web/back/.env.development
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> web/back/.env.development
+          echo DB_DATABASE=${{ vars.DB_DATABASE }} >> web/back/.env.development
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> web/back/.env.development
+          echo REDIS_HOST=${{ vars.REDIS_HOST }} >> web/back/.env.development
+          echo REDIS_DB_1=${{ vars.REDIS_DB_1 }} >> web/back/.env.development
+          echo REDIS_DB_0=${{ vars.REDIS_DB_0 }} >> web/back/.env.development
+          echo SMTP_HOST=${{ vars.SMTP_HOST }} >> web/back/.env.development
+          echo SMTP_PORT=${{ vars.SMTP_PORT }} >> web/back/.env.development
+          echo SMTP_USER=${{ vars.SMTP_USER }} >> web/back/.env.development
+          echo SMTP_PASS=${{ secrets.SMTP_PASS }} >> web/back/.env.development
+          echo HTTP_TIMEOUT=${{ vars.HTTP_MAX_REDIRECTS }} >> web/back/.env.development
+          echo HTTP_MAX_REDIRECTS=${{ vars.HTTP_MAX_REDIRECTS }} >> web/back/.env.development
+          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> web/back/.env.development
+          echo CLIENT_ORIGIN=${{ vars.CLIENT_ORIGIN }} >> web/back/.env.development
+          echo RECAPTCHA_SECRET=${{ secrets.RECAPTCHA_SECRET }} >> web/back/.env.development
       
       - name: Build project
         run: npm run build
