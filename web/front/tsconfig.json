@@ -1,0 +1,13 @@
+{
+  "extends": "./jsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "lib": ["es2022", "DOM"],
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "node" // 确保依赖包模块解析正确
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "src/env.d.ts", "src/main.js"]
+}
