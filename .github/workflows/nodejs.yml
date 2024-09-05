@@ -4,7 +4,7 @@ name: web-front CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # Triggers the workflow on push or pull request events but only for the "web-front" branch
   push:
     branches: ["web-front"]
   pull_request:
@@ -23,10 +23,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-      - run: chmod +x web/front/scripts/check.sh
-      - run: |
-          cd ../..
-          web/front/scripts/check.sh
+      - run: chmod +x scripts/check.sh
+      - run: scripts/check.sh
       - run: npm install
       # - run: npm run dev
       # - run: npm ci
