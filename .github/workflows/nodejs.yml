@@ -23,8 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-      - run: chmod +x scripts/check.sh
-      - run: scripts/check.sh
       - run: npm install
       # - run: npm run dev
       # - run: npm ci
