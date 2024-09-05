@@ -1,8 +1,4 @@
-<!--
-* @Component: 
-* @Maintainer: J.K. Yang
-* @Description: 
--->
+
 <script setup lang="ts">
 import EmailEditor from "../components/EmailEditor.vue";
 import { ref } from "vue";
@@ -21,7 +17,7 @@ const submit = () => {
           <template v-slot:default="{ expanded }">
             <div class="d-flex align-center w-full">
               <v-avatar size="36px">
-                <img src="@/assets/images/svg1.svg" alt="" />
+                <img src="" alt="" />
               </v-avatar>
               <div class="mx-3 flex-fill">
                 <div class="font-weight-bold mb-1 ml-1">title</div>
